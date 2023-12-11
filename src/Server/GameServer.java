@@ -21,6 +21,7 @@ public class GameServer {
         gameDataInitialServer.attachTemplateServer(new RoomControlUIUpdateServer(5007));
 
         gameDataInitialServer.attachTemplateServer(new CardUIUpdateServer(5010));
+        gameDataInitialServer.attachTemplateServer(new ItemUIUpdateServer(5011));
 
         //데이터 초기화 서버 스레드 동작
         new Thread(gameDataInitialServer).start();

@@ -1,5 +1,6 @@
 package Client.GamePanel.ItemStore;
 
+import Client.GamePanel.Card.CardPanel;
 import Client.GamePanel.Score.ScorePanel;
 
 import javax.swing.*;
@@ -23,10 +24,10 @@ public class ItemStorePanel extends JPanel {
 
     private ScorePanel scorePanel;
 
-    public ItemStorePanel(ScorePanel scorePanel){
+    public ItemStorePanel(ScorePanel scorePanel, CardPanel cardPanel){
 
         this.scorePanel = scorePanel;
-        purchasePanel = new ItemPurchasePanel(scorePanel);
+        purchasePanel = new ItemPurchasePanel(scorePanel, cardPanel);
 
         // BoxLayout을 생성하고, 이를 수직으로 설정
         setLayout(null);

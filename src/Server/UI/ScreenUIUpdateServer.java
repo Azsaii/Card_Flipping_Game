@@ -89,6 +89,7 @@ class ScreenUIUpdateServerThread extends ServerThread {
 
                 Player sendPlayer = playerManager.getPlayer(playerId);
                 GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
+                sendPlayer.setGameRoom(gameRoom);
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("command", "게임 화면 전환");

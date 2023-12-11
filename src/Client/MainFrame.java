@@ -8,9 +8,6 @@ import Network.DataTranslator;
 import Network.DataTranslatorWrapper;
 import Network.ServerName;
 import Server.Data.GameRoom;
-import Server.Data.Player;
-import Server.Manager.GameRoomManager;
-import Server.Manager.PlayerManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +25,6 @@ public class MainFrame extends JFrame {
     private final int ROOMSCREEN = 1;
     private final int GAMESCREEN = 2;
 
-    public static Player player;
     public static GameRoom gameRoom;
     public static long playerId;
     public static long roomId;
@@ -45,6 +41,8 @@ public class MainFrame extends JFrame {
         /* 서버 별 입출력 스트림을 다루는 객체 생성 */
         Map<String, Object> GameDataInitialServerResponse = new DataTranslator("localhost", 5000).receiveData(); //클라이언트는 GameDataInitialServer에 먼저 연결
         playerId = (long) GameDataInitialServerResponse.get("playerId"); // GameDataInitialServer에서 playerId를 얻습니다.
+
+        System.out.println("get from server id = " + playerId);
         
         dataTranslatorWrapper.add(ServerName.GAME_ROOM_DATA_SERVER, new DataTranslator("localhost", 5001));
         dataTranslatorWrapper.add(ServerName.SCREEN_UI_UPDATE_SERVER, new DataTranslator("localhost", 5002));
@@ -54,7 +52,8 @@ public class MainFrame extends JFrame {
         dataTranslatorWrapper.add(ServerName.CHAT_UI_UPDATE_SERVER, new DataTranslator("localhost", 5006));
         dataTranslatorWrapper.add(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER, new DataTranslator("localhost", 5007));
 
-        dataTranslatorWrapper.add(ServerName.CARD_UI_UPDATE_SEREVR, new DataTranslator("localhost", 5010));
+        dataTranslatorWrapper.add(ServerName.CARD_UI_UPDATE_SERVER, new DataTranslator("localhost", 5010));
+        dataTranslatorWrapper.add(ServerName.ITEM_UI_UPDATE_SERVER, new DataTranslator("localhost", 5011));
 
         /* 메인 화면 구성 */
         cardLayout = new CardLayout();
@@ -121,7 +120,6 @@ public class MainFrame extends JFrame {
                 } else if (command.equals("방 화면 전환")) {
                     updateScreen(ROOMSCREEN);
                 } else if (command.equals("게임 화면 전환")) {
-                    player = (Player) response.get("player");
                     gameRoom = (GameRoom) response.get("gameRoom");
                     updateScreen(GAMESCREEN);
                 }
@@ -149,19 +147,8 @@ public class MainFrame extends JFrame {
     public static void setRoomid(long roomId){
         MainFrame.roomId = roomId;
     }
-
-    public static long getRoomid(){
-
-        return MainFrame.roomId;
-    }
-    public static Player getPlayer(){
-        return MainFrame.player;
-    }
-    public static GameRoom getGameRoom(){
-
-        return MainFrame.gameRoom;
-    }
-
+    public static long getRoomid(){return MainFrame.roomId;}
+    public static GameRoom getGameRoom(){return MainFrame.gameRoom;}
 
     public static void main(String[] args) throws IOException {
         MainFrame frame = new MainFrame();

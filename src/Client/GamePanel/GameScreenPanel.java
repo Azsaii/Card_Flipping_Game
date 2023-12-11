@@ -34,6 +34,8 @@ public class GameScreenPanel extends JPanel {
     public GameScreenPanel(long playerId){
         this.playerId = playerId;
         setLayout(null);    // 배치관리자 제거
+
+        System.out.println("GameScreenPanel id = " + playerId);
     }
     private void setPanelProperties(JPanel panel, int x, int y, int width, int height) {
         panel.setBounds(x, y, width, height);
@@ -42,14 +44,12 @@ public class GameScreenPanel extends JPanel {
 
     /* 현재 플레이어가 속한 방 객체 찾기 */
     public void startGameRoom(){
-        Player player = MainFrame.getPlayer();
         GameRoom gameRoom = MainFrame.getGameRoom();
-        System.out.println("player = " + player);
         playerType = (playerId == gameRoom.getLeader().getId()) ? PLAYER1 : PLAYER2;
 
         scorePanel = new ScorePanel();
-        cardPanel = new CardPanel(scorePanel, player, gameRoom, playerType);
-        itemStorePanel = new ItemStorePanel(scorePanel);
+        cardPanel = new CardPanel(scorePanel, playerId, gameRoom, playerType);
+        itemStorePanel = new ItemStorePanel(scorePanel, cardPanel);
 
         setPanelProperties(itemStorePanel, 0, 0, 350, 800);
         setPanelProperties(scorePanel, 350, 0, 800, 100);

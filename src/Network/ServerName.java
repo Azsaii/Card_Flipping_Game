@@ -11,6 +11,7 @@ public enum ServerName {
     CHAT_UI_UPDATE_SERVER, //전체 채팅을 업데이트 하기 위한 서버
     ROOM_CONTROL_UI_UPDATE_SERVER, //방 컨트롤 UI를 업데이트 하기 위한 서버
 
-    CARD_UI_UPDATE_SEREVR, // 카드 UI 업데이트 서버
+    CARD_UI_UPDATE_SERVER, // 카드 UI 업데이트 서버
+    ITEM_UI_UPDATE_SERVER, // 아이템 UI 업데이트 서버
 }
 

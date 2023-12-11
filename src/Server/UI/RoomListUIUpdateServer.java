@@ -2,6 +2,7 @@ package Server.UI;
 
 import Network.DataTranslator;
 import Network.ServerName;
+import Server.Data.GameRoom;
 import Server.Data.GameWaitingRoom;
 import Server.Data.Player;
 import Server.Manager.GameRoomManager;
@@ -23,7 +24,6 @@ public class RoomListUIUpdateServer extends ServerTemplate {
         super(port);
     }
 
-
     @Override
     protected void handleClient(){
         RoomListUIUpdateServerThread roomListUIUpdateServerThread = new RoomListUIUpdateServerThread(dataTranslator, cyclicBarrier);
@@ -34,7 +34,6 @@ public class RoomListUIUpdateServer extends ServerTemplate {
 
     }
 }
-
 
 class RoomListUIUpdateServerThread extends ServerThread {
 

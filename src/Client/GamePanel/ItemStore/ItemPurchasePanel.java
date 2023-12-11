@@ -1,5 +1,6 @@
 package Client.GamePanel.ItemStore;
 
+import Client.GamePanel.Card.CardPanel;
 import Server.Data.ItemData;
 import Client.GamePanel.Score.DoubleScoreStrategy;
 import Client.GamePanel.Score.ScorePanel;
@@ -8,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Random;
 
 import static Client.GamePanel.ItemStore.ItemStorePanel.ITEM_COUNT;
 
@@ -36,11 +38,15 @@ public class ItemPurchasePanel extends JPanel {
     // 아이템 구입에 따른 스코어 처리를 위해 주입받음
     private ScorePanel scorePanel;
 
-    public ItemPurchasePanel(ScorePanel scorePanel){
+    // 아이템 구입에 따른 카드 패널에게 메시지를 보내기 위해 주입받음
+    private CardPanel cardPanel;
+
+    public ItemPurchasePanel(ScorePanel scorePanel, CardPanel cardPanel){
 
         this.scorePanel = scorePanel;
-        setItemDatas(); // 아이템 데이터를 배열에 세팅
+        this.cardPanel = cardPanel;
 
+        setItemDatas(); // 아이템 데이터를 배열에 세팅
         setLayout(new GridLayout(2, 3)); // 2행 3열의 그리드 레이아웃
 
         // 아이템 패널 생성 및 추가
@@ -104,11 +110,19 @@ public class ItemPurchasePanel extends JPanel {
 
                 ItemLabel source = (ItemLabel) e.getSource();
                 int itemId = source.getItemId();
-
-                System.out.println(source.getName());
-
+                System.out.println("아이템 클릭됨, itemid " + itemId);
                 switch (itemId) {
-                    case 4: scorePanel.setStrategy(new DoubleScoreStrategy());  // 더블 이벤트
+                    case 1: { // 랜덤 뒤집개
+                        System.out.println("랜덤 뒤집개 사용됨");
+                        boolean[] randomCardArray = new boolean[24];
+                        Random rand = new Random();
+                        for(int index = 0; index < randomCardArray.length; index++) {
+                            randomCardArray[index] = rand.nextBoolean();
+                        }
+                        cardPanel.sendRandomFlipData(randomCardArray); // 서버로 카드 데이터 전송
+                        break;
+                    }
+                    case 4: scorePanel.setStrategy(new DoubleScoreStrategy()); break; // 더블 이벤트
                 }
             }
         });

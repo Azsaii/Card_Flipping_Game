@@ -4,7 +4,7 @@ import Network.DataTranslator;
 import Network.ServerName;
 import Server.Data.GameRoom;
 import Server.Data.Player;
-import Server.GameServer;
+import Server.Manager.GameRoomManager;
 import Server.Manager.PlayerManager;
 import Server.ServerTemplate;
 import Server.ServerThread;
@@ -24,23 +24,22 @@ public class CardUIUpdateServer extends ServerTemplate {
 
     @Override
     protected void handleClient() {
-        CardUIUpdateServerThread gameDataStatusUIUpdateServerThread = new CardUIUpdateServerThread(dataTranslator, cyclicBarrier);
+        CardUIUpdateServerThread cardUIUpdateServerThread = new CardUIUpdateServerThread(dataTranslator, cyclicBarrier);
 
         Player player = PlayerManager.getInstance().getPlayer(playerId); // Player 객체 찾기
-        player.addServer(ServerName.CARD_UI_UPDATE_SEREVR, dataTranslator); // 찾은 Player 객체에 현재 서버에서 생성한 DataTranslator 객체를 추가
-        gameDataStatusUIUpdateServerThread.start(); // 서버 스레드 실행
+        player.addServer(ServerName.CARD_UI_UPDATE_SERVER, dataTranslator); // 찾은 Player 객체에 현재 서버에서 생성한 DataTranslator 객체를 추가
+        cardUIUpdateServerThread.start(); // 서버 스레드 실행
 
     }
 }
 
 /**
- * 플레이어 1명의 카드/아이템 입출력 담당 스레드
+ * 플레이어 1명의 카드입출력 담당 스레드
  * 플레이어가 보낸 카드데이터를 같은 방의 다른 플레이어에게 전송한다.
  */
 class CardUIUpdateServerThread extends ServerThread {
 
-    public static final String command_card = "CARD_UPDATE";
-    // public static final String command_item = "ITEM_UPDATE";
+    public static final String CARD_UPDATE = "CARD_UPDATE";
 
     public CardUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
@@ -63,26 +62,24 @@ class CardUIUpdateServerThread extends ServerThread {
             Map<String, Object> request = dataTranslator.receiveData();
             String command = (String) request.get("command");
 
-            System.out.println("GameDataStatusUIUpdateServerThread 실행");
+            long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
+            Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
+            GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
 
             /* 카드 상태 업데이트 관련 요청 처리 */
-            if (command.equals(command_card)) {
+            if (command.equals(CARD_UPDATE)) {
 
                 Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 
-                long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
-                Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
-                GameRoom gameRoom = currentPlayer.getGameRoom(); // 현재 플레이어가 속한 GameRoom 객체 얻기
-
                 /* 응답 객체에 데이터 추가 */
-                response.put("command", command_card); // 카드 상태 업데이트 명령 추가
+                response.put("command", CARD_UPDATE); // 카드 상태 업데이트 명령 추가
                 response.put("senderId", playerId); // 카드 뒤집은 플레이어 ID 추가
-                response.put("location", request.get("location")); // 뒤집은 카드 좌표 데이터 추가
+                response.put("location", request.get("location"));
 
                 /* 상대에게 카드 업데이트 메시지 전송 */
                 List<Player> players = gameRoom.getPlayers();
                 for(Player player : players) { ////현재 플레이어가 속한 게임 방에 필요한 데이터를 보냅니다.
-                    DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.CARD_UI_UPDATE_SEREVR);
+                    DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.CARD_UI_UPDATE_SERVER);
                     playerDataTranslator.sendData(response);
                 }
             }

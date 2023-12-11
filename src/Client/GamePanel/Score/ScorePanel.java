@@ -57,20 +57,19 @@ public class ScorePanel extends JPanel {
         panel.add(scoreLable);
     }
 
-    // 스코어 갱신
-    private void addScore(int addScore) {
+    // 스코어 추가
+    public void addScore(int score, int playerType) {
         JLabel targetLable = score1;
         if(playerType == PLAYER1) targetLable = score1;
         else if(playerType == PLAYER2) targetLable = score2;
         
-        int newScore = Integer.valueOf(targetLable.getText()) + addScore;
+        int newScore = Integer.valueOf(targetLable.getText()) + score;
         targetLable.setText(String.valueOf(newScore));
     }
 
     // 모드에 따라 스코어 추가
     public void updateScore(int playerType) {
-        this.playerType = playerType;
-        addScore(strategy.getScore());
+        addScore(strategy.getScore(), playerType);
     }
 
     // 스코어 반환
