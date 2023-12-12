@@ -9,13 +9,6 @@ import java.net.Socket;
  */
 public class ItemStoreImagePanel extends JPanel {
 
-    // 싱글톤
-    private static ItemStoreImagePanel instance;
-    public static synchronized ItemStoreImagePanel getInstance(){
-        if(instance == null) instance = new ItemStoreImagePanel();
-        return instance;
-    }
-
     private Socket clientDataSocket;
     private BufferedReader din;
     private BufferedWriter dout;

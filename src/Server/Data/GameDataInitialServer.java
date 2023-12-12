@@ -36,24 +36,23 @@ public  class GameDataInitialServer extends ServerTemplate {
 
     @Override
     protected void handleClient() {
-        long playerId = PlayerManager.getInstance().getNextPlayerId(); //플레이어 ID 값을 PlayerManager한테 얻음.
+        long playerId = PlayerManager.getInstance().getNextPlayerId(); // 플레이어 ID 값을 PlayerManager 에게서 얻음.
 
-        Player player = new Player(playerId, "플레이어 " + playerId); //플레이어 객체 생성.
+        Player player = new Player(playerId, "플레이어 " + playerId); // 플레이어 객체 생성.
 
-        PlayerManager.getInstance().addPlayer(playerId, player); //플레이어 객체를 PlayerManager에 추가
+        PlayerManager.getInstance().addPlayer(playerId, player); // 플레이어 객체를 PlayerManager 에 추가
 
-        GameWaitingRoomManager.getInstance().enter(player); //처음 게임에 입장한 플레이어는 게임 대기 방 객체에 입장
+        GameWaitingRoomManager.getInstance().enter(player); // 처음 게임에 입장한 플레이어는 게임 대기 방 객체에 입장
 
         CyclicBarrier cyclicBarrier = new CyclicBarrier(9); // 스레드의 수에 맞게 CyclicBarrier 설정
 
-        notify(playerId, cyclicBarrier); //모든 서버에 플레이어 ID 값와 CyclicBarrier 객체 설정
+        notify(playerId, cyclicBarrier); // 모든 서버에 플레이어 ID 값와 CyclicBarrier 객체 설정
 
-        //클라이언트 쪽으로 플레이어 ID 값을 보냄
+        // 클라이언트 쪽으로 플레이어 ID 값을 보냄
         Map<String, Object> request = new HashMap<>();
         request.put("playerId", playerId);
 
-        dataTranslator.sendData(request);  //클라이언트쪽으로 request 매팅 데이터를 보냄
-
+        dataTranslator.sendData(request);  // 클라이언트쪽으로 request 매팅 데이터를 보냄
+        dataTranslator = null; // 더 이상 사용하지 않으므로 제거
     }
-
 }

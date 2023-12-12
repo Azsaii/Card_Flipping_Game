@@ -66,6 +66,7 @@ public class RoomChatPanel extends JPanel {
 
             while (true) {
                 Map<String, Object> response = dataTranslator.receiveData();
+                if(response == null) break;
                 String command = (String) response.get("command");
 
                 if (command.equals("방 채팅 업데이트")) {

@@ -29,6 +29,9 @@ public class ScorePanel extends JPanel {
 
         score1 = new JLabel("0");
         score2 = new JLabel("0");
+
+        score1.setForeground(new Color(69, 167, 94));
+        score2.setForeground(new Color(240, 69, 245));
         JLabel scoreText = new JLabel("SCORE");
 
         addScorePanel(p1, score1, JLabel.CENTER);
@@ -73,7 +76,7 @@ public class ScorePanel extends JPanel {
     }
 
     // 스코어 반환
-    public String getScore() {
+    public String getScore(int playerType) {
         if(playerType == PLAYER1) return score1.getText();
         else if(playerType == PLAYER2) return score2.getText();
         else return "0";

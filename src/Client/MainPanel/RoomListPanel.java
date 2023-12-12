@@ -73,11 +73,11 @@ public class RoomListPanel extends JPanel {
             request.put("command", "게임 입장");
             request.put("playerId", MainFrame.playerId);
             MainFrame.dataTranslatorWrapper.broadcast(request);
+            DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ROOM_LIST_UI_UPDATE_SERVER);
 
             while (true) {
-                DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ROOM_LIST_UI_UPDATE_SERVER);
-
                 Map<String, Object> response = dataTranslator.receiveData();
+                if (response == null) break;
                 String command = (String) response.get("command");
 
                 if (command.equals("방 리스트 업데이트")) {

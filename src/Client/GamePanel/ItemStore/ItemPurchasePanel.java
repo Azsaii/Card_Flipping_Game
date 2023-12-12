@@ -20,8 +20,8 @@ import static Client.GamePanel.ItemStore.ItemStorePanel.ITEM_COUNT;
  */
 public class ItemPurchasePanel extends JPanel {
 
-    ItemDescriptionPanel descriptionPanel = ItemDescriptionPanel.getInstance(); // 설명 패널
-    ItemInUsePanel inUsePanel = ItemInUsePanel.getInstance();                   // 보유 패널
+    ItemDescriptionPanel descriptionPanel; // 설명 패널
+    ItemInUsePanel inUsePanel;                   // 보유 패널
     
     private static final int ITEM_PURCHASE_LIMIT = 2;   // 아이템 최대 구입 가능 수
     private int inUseItemDataCount = 0;   // 사용 중인 아이템 수
@@ -41,10 +41,12 @@ public class ItemPurchasePanel extends JPanel {
     // 아이템 구입에 따른 카드 패널에게 메시지를 보내기 위해 주입받음
     private CardPanel cardPanel;
 
-    public ItemPurchasePanel(ScorePanel scorePanel, CardPanel cardPanel){
+    public ItemPurchasePanel(ScorePanel scorePanel, CardPanel cardPanel, ItemDescriptionPanel descriptionPanel, ItemInUsePanel inUsePanel){
 
         this.scorePanel = scorePanel;
         this.cardPanel = cardPanel;
+        this.descriptionPanel = descriptionPanel;
+        this.inUsePanel = inUsePanel;
 
         setItemDatas(); // 아이템 데이터를 배열에 세팅
         setLayout(new GridLayout(2, 3)); // 2행 3열의 그리드 레이아웃
@@ -104,8 +106,7 @@ public class ItemPurchasePanel extends JPanel {
             // 마우스를 클릭하면 아이템 보유 패널에 구입한 아이템 리스트가 전달되어 표시
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(inUseItemDataCount != ITEM_PURCHASE_LIMIT)
-                    inUseItemDataCount++;
+                if(inUseItemDataCount != ITEM_PURCHASE_LIMIT) inUseItemDataCount++;
                 inUsePanel.setInUseItem(itemDatas[i]);
 
                 ItemLabel source = (ItemLabel) e.getSource();
@@ -113,7 +114,6 @@ public class ItemPurchasePanel extends JPanel {
                 System.out.println("아이템 클릭됨, itemid " + itemId);
                 switch (itemId) {
                     case 1: { // 랜덤 뒤집개
-                        System.out.println("랜덤 뒤집개 사용됨");
                         boolean[] randomCardArray = new boolean[24];
                         Random rand = new Random();
                         for(int index = 0; index < randomCardArray.length; index++) {
@@ -122,6 +122,7 @@ public class ItemPurchasePanel extends JPanel {
                         cardPanel.sendRandomFlipData(randomCardArray); // 서버로 카드 데이터 전송
                         break;
                     }
+                    case 3: cardPanel.sendGoldFlipData(); break; // 황금 뒤집개
                     case 4: scorePanel.setStrategy(new DoubleScoreStrategy()); break; // 더블 이벤트
                 }
             }

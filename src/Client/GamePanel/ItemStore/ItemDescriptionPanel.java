@@ -8,13 +8,6 @@ import java.awt.*;
  * GameItemPurchasePanel 의 아이템 위에 마우스를 올리면 이 패널에 아이템 정보가 표시됨
  */
 public class ItemDescriptionPanel extends JPanel {
-
-    // 싱글톤
-    private static ItemDescriptionPanel instance;
-    public static synchronized ItemDescriptionPanel getInstance(){
-        if(instance == null) instance = new ItemDescriptionPanel();
-        return instance;
-    }
     
     JLabel nameLabel; // 아이템 이름 레이블
     JTextArea descriptionArea; // 아이템 설명 텍스트 영역

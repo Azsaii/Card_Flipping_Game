@@ -3,7 +3,7 @@ package Server.Manager;
 import Server.Data.GameWaitingRoom;
 import Server.Data.Player;
 
-//싱글톤 패턴을 적용한 클래스, 여러 스레드에서 사용하려면 synchronized 키워드로 동기화 작업을 해야함.
+// 싱글톤 패턴을 적용한 클래스, 여러 스레드에서 사용하려면 synchronized 키워드로 동기화 작업을 해야함.
 public class GameWaitingRoomManager {
     private static GameWaitingRoomManager gameManager = new GameWaitingRoomManager();
 

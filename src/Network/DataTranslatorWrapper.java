@@ -1,5 +1,6 @@
 package Network;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,6 +22,12 @@ public class DataTranslatorWrapper {
     public synchronized void broadcast(Map<String, Object> request) {
         for (DataTranslator dataTranslator : dataTranslators.values()) {
             dataTranslator.sendData(request);
+        }
+    }
+
+    public void closeAllSocket(){
+        for (DataTranslator dataTranslator : dataTranslators.values()) {
+            dataTranslator.closeSocket();
         }
     }
 }

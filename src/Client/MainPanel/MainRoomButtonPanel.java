@@ -14,6 +14,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 방 생성, 게임 종료(나가기) 버튼이 있는 패널
+ */
 public class MainRoomButtonPanel extends JPanel  {
 
     public MainRoomButtonPanel() {
@@ -60,6 +63,7 @@ public class MainRoomButtonPanel extends JPanel  {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                MainFrame.exitGame();
                 System.exit(0);
             }
         });

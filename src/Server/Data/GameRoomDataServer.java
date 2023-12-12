@@ -21,7 +21,6 @@ public class GameRoomDataServer extends ServerTemplate {
     @Override
     protected void handleClient()  {
         GameRoomDataServerThread gameDataServer = new GameRoomDataServerThread(dataTranslator, cyclicBarrier);
-
         gameDataServer.start();
     }
 }
@@ -40,8 +39,11 @@ class GameRoomDataServerThread extends ServerThread {
         PlayerManager playerManager = PlayerManager.getInstance();
 
         while (true) { //각 플레이어들이 보낸 명령어를 처리하는 구간
-            Map<String, Object> request = dataTranslator.receiveData(); //클라이언트으로 부터 request 맵핑 정보를 가져옴.
-            System.out.println("GameDataServer 실행");
+
+            /* 요청을 받아 처리 */
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
+
             String command = (String) request.get("command");
 
             if (command.equals("방 생성")) {
@@ -69,6 +71,7 @@ class GameRoomDataServerThread extends ServerThread {
                 Map<String, Object> response = new HashMap<>();
 
                 if(gameRoomManager.enter(roomId, currentPlayer)) { //현재 플레이어를 해당 ID 값을 가진 게임 방에 입장 시킴.
+                    System.out.println("SERVER: ROOM ENTERED player: " + currentPlayer + ", roomId: " + roomId);
                     gameWaitingRoomManager.leave(currentPlayer); //만약 성공적으로 게임 방에 입장 했다면 현재 플레이어를 대기 방에서 나가게 함.
                     response.put("result", "OK");
                     dataTranslator.sendData(response);
@@ -96,7 +99,6 @@ class GameRoomDataServerThread extends ServerThread {
                 Player currentPlayer = playerManager.getPlayer(playerId); //플레이어를 찾음.
 
                 currentPlayer.setReady(false); //준비 미완료 상태로 바꿈
-                System.out.println("TEST " + playerId + ", " + currentPlayer.isReady());
 
                 gameRoomManager.leave(roomId, currentPlayer); //현재 플레이가 roomId에 해당하는 게임 방에서 나감
 

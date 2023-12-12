@@ -11,7 +11,10 @@ import Server.Data.GameRoom;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,7 +45,7 @@ public class MainFrame extends JFrame {
         Map<String, Object> GameDataInitialServerResponse = new DataTranslator("localhost", 5000).receiveData(); //클라이언트는 GameDataInitialServer에 먼저 연결
         playerId = (long) GameDataInitialServerResponse.get("playerId"); // GameDataInitialServer에서 playerId를 얻습니다.
 
-        System.out.println("get from server id = " + playerId);
+        System.out.println("mainframe - playerId id = " + playerId);
         
         dataTranslatorWrapper.add(ServerName.GAME_ROOM_DATA_SERVER, new DataTranslator("localhost", 5001));
         dataTranslatorWrapper.add(ServerName.SCREEN_UI_UPDATE_SERVER, new DataTranslator("localhost", 5002));
@@ -113,6 +116,7 @@ public class MainFrame extends JFrame {
 
             while (true) {
                 Map<String, Object> response = dataTranslator.receiveData();
+                if(response == null) break;
                 String command = (String) response.get("command");
 
                 if(command.equals("메인 화면 전환")) {
@@ -126,6 +130,13 @@ public class MainFrame extends JFrame {
             }
         });
         updateScreenThread.start();
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exitGame();
+            }
+        });
     }
 
     public void updateScreen(int screenOption) {
@@ -142,6 +153,15 @@ public class MainFrame extends JFrame {
                 cardLayout.show(mainPanel, "gameScreenPanel");
                 break;
         }
+    }
+
+    public static void exitGame(){
+        // 프레임이 닫힐 때 모든 소켓 닫기
+        Map<String, Object> request = new HashMap<>();
+        request.put("command", "exit"); // 요청 종류
+        request.put("playerId", playerId); // 플레이어 id
+        dataTranslatorWrapper.broadcast(request);
+        dataTranslatorWrapper.closeAllSocket();
     }
 
     public static void setRoomid(long roomId){

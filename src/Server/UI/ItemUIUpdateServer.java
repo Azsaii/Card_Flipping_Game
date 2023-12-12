@@ -39,7 +39,10 @@ public class ItemUIUpdateServer extends ServerTemplate {
  */
 class ItemUIUpdateServerThread extends ServerThread {
 
-    public static final String RANDOM_FLIP = "RANDOM_FLIP";
+    static final String RANDOM_FLIP = "RANDOM_FLIP";
+    static final String GOLD_FLIP = "GOLD_FLIP";
+    static final String DOUBLE_EVENT = "DOUBLE_EVENT";
+    static final String ICE_AGE = "ICE_AGE";
     public ItemUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
     }
@@ -58,14 +61,15 @@ class ItemUIUpdateServerThread extends ServerThread {
             }
 
             /* 요청을 받아 처리 */
-            Map<String, Object> request = dataTranslator.receiveData();
-            String command = (String) request.get("command");
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
-            if(command.equals(RANDOM_FLIP)){
+            String command = (String) request.get("command");
+            if(command.equals(RANDOM_FLIP) || command.equals(GOLD_FLIP) || command.equals(DOUBLE_EVENT) || command.equals(ICE_AGE)){
 
                 Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 
-                System.out.println("서버: 랜덤 뒤집개 사용됨 - " + command);
+                System.out.println("서버: 아이템 사용됨 - " + command);
                 long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
                 Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
                 GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);

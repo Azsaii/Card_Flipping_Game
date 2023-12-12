@@ -11,6 +11,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 메인 화면 채팅 패널
+ */
 public class MainChatPanel extends JPanel {
     JButton button;
     JTextField textField;
@@ -60,11 +63,11 @@ public class MainChatPanel extends JPanel {
         textField.addActionListener(new RoomSendChatAction());
 
         Thread RoomChatThread = new Thread(() -> {
-            System.out.println("전체 채팅 업데이트 스레드 작동");
             DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.CHAT_UI_UPDATE_SERVER);
 
             while (true) {
                 Map<String, Object> response = dataTranslator.receiveData();
+                if(response == null) break;
                 String command = (String) response.get("command");
 
                 if (command.equals("전체 채팅 업데이트")) {

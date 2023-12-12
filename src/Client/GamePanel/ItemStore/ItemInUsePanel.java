@@ -12,13 +12,6 @@ import java.awt.*;
  */
 public class ItemInUsePanel extends JPanel {
 
-    // 싱글톤
-    private static ItemInUsePanel instance;
-    public static synchronized ItemInUsePanel getInstance(){
-        if(instance == null) instance = new ItemInUsePanel();
-        return instance;
-    }
-
     private JPanel itemPanel1;  // 사용 중인 아이템 표시 패널 1
     private JPanel itemPanel2;  // 사용 중인 아이템 표시 패널 2
 

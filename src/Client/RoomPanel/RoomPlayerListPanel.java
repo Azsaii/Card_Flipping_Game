@@ -19,11 +19,12 @@ public class RoomPlayerListPanel extends JPanel {
         setLayout(new GridLayout(0, 2, 10, 0));
 
         Thread updatePlayerStatusThread = new Thread(() -> {
-            System.out.println("플레이어 정보 업데이트 스레드 작동");
             DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.PLAYER_STATUS_UI_UPDATE_SERVER);
 
             while (true) {
-                   Map<String, Object> response = dataTranslator.receiveData();
+
+                Map<String, Object> response = dataTranslator.receiveData();
+                if(response == null) break;
                    String command = (String) response.get("command");
 
                     if (command.equals("플레이어 정보 업데이트")) {

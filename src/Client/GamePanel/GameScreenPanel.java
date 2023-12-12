@@ -11,6 +11,7 @@ import Server.Manager.GameRoomManager;
 import Server.Manager.PlayerManager;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -27,15 +28,13 @@ public class GameScreenPanel extends JPanel {
     private ScorePanel scorePanel; // 스코어 패널. 임시로 플레이어1로 설정.
     private ItemStorePanel itemStorePanel; // 아이템 상점 패널
     private CardPanel cardPanel; // 카드 패널 임시로 플레이어1로 설정.
-    private GameTimerLimitPanel timeLimitPanel = new GameTimerLimitPanel(); // 타이머 패널
+    private GameTimerLimitPanel timeLimitPanel; // 타이머 패널
     private GameChatPanel chatPanel = new GameChatPanel(); // 채팅 패널
 
     // 패널 위치, 크기 정하고 붙이기
     public GameScreenPanel(long playerId){
         this.playerId = playerId;
         setLayout(null);    // 배치관리자 제거
-
-        System.out.println("GameScreenPanel id = " + playerId);
     }
     private void setPanelProperties(JPanel panel, int x, int y, int width, int height) {
         panel.setBounds(x, y, width, height);
@@ -47,15 +46,17 @@ public class GameScreenPanel extends JPanel {
         GameRoom gameRoom = MainFrame.getGameRoom();
         playerType = (playerId == gameRoom.getLeader().getId()) ? PLAYER1 : PLAYER2;
 
+        // 순서 바꾸면 안된다.
         scorePanel = new ScorePanel();
-        cardPanel = new CardPanel(scorePanel, playerId, gameRoom, playerType);
+        cardPanel = new CardPanel(scorePanel, playerId, playerType);
         itemStorePanel = new ItemStorePanel(scorePanel, cardPanel);
+        timeLimitPanel = new GameTimerLimitPanel(scorePanel, playerType);
 
         setPanelProperties(itemStorePanel, 0, 0, 350, 800);
         setPanelProperties(scorePanel, 350, 0, 800, 100);
         setPanelProperties(timeLimitPanel, 650, 100, 200, 50);
         setPanelProperties(cardPanel, 350, 100, 800, 700);
-        setPanelProperties(chatPanel, 1150, 0, 350, 800);
+        setPanelProperties(chatPanel, 1150, 0, 350, 800);;
 
         addComponentListener(new ComponentAdapter() {
             @Override

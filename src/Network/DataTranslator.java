@@ -7,13 +7,15 @@ import java.util.Map;
 //데이터 송수신을 위한 클래스
 public class DataTranslator{
 
+    private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
+    public Socket getSocket(){return socket;}
 
     //클라이언트에서 서버로 연결을 하고자 할 때 사용하는 생성자
     public DataTranslator(String host, int port) throws IOException {
-        Socket socket = new Socket(host, port);
+        socket = new Socket(host, port);
         out = new ObjectOutputStream(socket.getOutputStream());
         in = new ObjectInputStream(socket.getInputStream());
     }
@@ -45,9 +47,22 @@ public class DataTranslator{
             } else {
                 throw new IllegalArgumentException("Received object is not a map");
             }
-        }catch (IOException |ClassNotFoundException e) {
+        }catch (IOException e) {
+            System.out.println("Input stream is closed or no data available.");
+            return null;  // 스트림이 닫힌 경우 null 반환
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
+    // 소켓 close
+    public synchronized void closeSocket(){
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -25,9 +25,11 @@ public class PlayerManager {
     }
 
     public void addPlayer(Long playerId, Player player) {
-
         playerMap.put(playerId, player);
+    }
 
+    public void removePlayer(Long playerId){
+        playerMap.remove(playerId);
     }
 
     //현재 플레이어 ID값을 리턴하고 플레이어 ID값 +1 증가시키는 메서드

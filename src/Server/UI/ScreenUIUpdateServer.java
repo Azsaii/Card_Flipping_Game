@@ -33,8 +33,6 @@ public class ScreenUIUpdateServer extends ServerTemplate {
 
     }
 }
-
-
 class ScreenUIUpdateServerThread extends ServerThread {
 
 
@@ -55,11 +53,11 @@ class ScreenUIUpdateServerThread extends ServerThread {
                 throw new RuntimeException(e);
             }
 
-            System.out.println("ScreenUIUpdateServerThread 실행" + this);
+            /* 요청을 받아 처리 */
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
-            Map<String, Object> request = dataTranslator.receiveData();
             String command = (String) request.get("command");
-
             if (command.equals("방 생성") || command.equals("방 입장")) {
 
                 if (command.equals("방 입장")) {
@@ -83,7 +81,7 @@ class ScreenUIUpdateServerThread extends ServerThread {
 
                 dataTranslator.sendData(response);
 
-            }else if (command.equals("게임 시작")) {
+            }else if (command.equals("게임 시작")) { // MainFrame 에서 받고 화면을 업데이트한다.
                 long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 id 가져옴
                 long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 id 가져옴.
 

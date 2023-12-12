@@ -59,15 +59,17 @@ class CardUIUpdateServerThread extends ServerThread {
             }
 
             /* 요청을 받아 처리 */
-            Map<String, Object> request = dataTranslator.receiveData();
-            String command = (String) request.get("command");
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
-            long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
-            Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
-            GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
+            String command = (String) request.get("command");
 
             /* 카드 상태 업데이트 관련 요청 처리 */
             if (command.equals(CARD_UPDATE)) {
+
+                long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
+                Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
+                GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
 
                 Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 

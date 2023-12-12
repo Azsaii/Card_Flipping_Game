@@ -16,6 +16,20 @@ import java.util.Map;
 
 public class RoomControlPanel extends JPanel {
 
+    JButton readyButton;
+    JButton startButton;
+
+    ImageIcon exitIcon = new ImageIcon("images/exit-icon.png");
+    ImageIcon readyFillIcon = new ImageIcon("images/ready-icon-fill.png");
+    ImageIcon readyOutlineIcon = new ImageIcon("images/ready-icon-outline.png");
+
+    // 버튼 상태 초기화 메서드
+    public void setInitButtons(){
+        readyButton.setEnabled(true);
+        readyButton.setIcon(readyOutlineIcon);
+        startButton.setEnabled(false);
+    }
+
     RoomControlPanel(long playerId) {
 
         setLayout(new GridLayout());
@@ -33,7 +47,6 @@ public class RoomControlPanel extends JPanel {
         gbc.weighty = 3.0;
         gbc.fill = GridBagConstraints.BOTH;
         panel1.add(panel2, gbc);
-        ImageIcon exitIcon = new ImageIcon("images/exit-icon.png");
         JButton exitButton = new JButton(exitIcon);
 
         exitButton.setOpaque(false);
@@ -48,11 +61,7 @@ public class RoomControlPanel extends JPanel {
         gbc.insets = new Insets(0, 5, 0, 0);
         panel2.add(exitButton, gbc);
 
-        ImageIcon readyFillIcon = new ImageIcon("images/ready-icon-fill.png");
-        ImageIcon readyOutlineIcon = new ImageIcon("images/ready-icon-outline.png");
-
-        JButton readyButton = new JButton(readyOutlineIcon);
-
+        readyButton = new JButton(readyOutlineIcon);
         readyButton.setOpaque(false);
         readyButton.setContentAreaFilled(false);
         readyButton.setBorderPainted(false);
@@ -68,7 +77,7 @@ public class RoomControlPanel extends JPanel {
 
         ImageIcon startIcon = new ImageIcon("images/start-icon.png");
 
-        JButton startButton = new JButton(startIcon);
+        startButton = new JButton(startIcon);
 
         startButton.setOpaque(false);
         startButton.setContentAreaFilled(false);
@@ -86,7 +95,6 @@ public class RoomControlPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JButton button = (JButton) e.getSource();
-
 
                 Map<String, Object> request = new HashMap<>();
 
@@ -134,23 +142,19 @@ public class RoomControlPanel extends JPanel {
                 MainFrame.dataTranslatorWrapper.broadcast(request);
 
                 MainFrame.roomId = 0; //현재 플레이어의 roomId를 0으로 초기화
-                readyButton.setEnabled(true); //준비 버튼 비활성화
-                readyButton.setIcon(readyOutlineIcon);
-                startButton.setEnabled(false);
+                setInitButtons();
             }
         });
 
-
         add(panel1);
 
-
         Thread updateRoomControlThread = new Thread(() -> {
-            System.out.println("방 컨트롤 업데이트 스레드 작동");
+            DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
 
             while (true) {
-                DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
 
                 Map<String, Object> response = dataTranslator.receiveData();
+                if(response == null) break;
                 String command = (String) response.get("command");
 
                 if (command.equals("게임 시작 UI 업데이트")) {
@@ -160,6 +164,8 @@ public class RoomControlPanel extends JPanel {
                     } else if (result.equals("FAIL")) {
                         startButton.setEnabled(false);
                     }
+                } else if(command.equals("init_btn")){ // 버튼 초기화
+                    setInitButtons();
                 }
             }
         });

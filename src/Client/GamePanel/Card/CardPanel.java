@@ -2,9 +2,6 @@ package Client.GamePanel.Card;
 
 import Client.GamePanel.Score.ScorePanel;
 import Client.MainFrame;
-import Network.DataTranslator;
-import Network.ServerName;
-import Server.Data.GameRoom;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,24 +23,22 @@ public class CardPanel extends JPanel {
     static final String DOUBLE_EVENT = "DOUBLE_EVENT";
     static final String ICE_AGE = "ICE_AGE";
 
-    private long playerId;
-    private GameRoom gameRoom;
-    private int playerType; // 1p / 2p 구분. 0, 1
+    public long playerId;
+    public int playerType; // 1p / 2p 구분. 0, 1
     private ScorePanel scorePanel;
-    private final CardLabel[][] cardLabels = new CardLabel[4][6];  // 4행 6열의 카드 배열
+    public final CardLabel[][] cardLabels = new CardLabel[4][6];  // 4행 6열의 카드 배열
 
-    public ImageIcon red;
-    public ImageIcon green;
+    public ImageIcon redCardImg;
+    public ImageIcon greenCardImg;
 
     /**
      * 카드 관련 전담 패널
      * 카드 클릭 시 화면을 업데이트하고 상대방에게 뒤집은 카드 위치정보 전달
      * 카드 클릭 시 스코어 업데이트 메시지 전송
      */
-    public CardPanel(ScorePanel scorePanel, long playerId, GameRoom gameRoom, int playerType) {
+    public CardPanel(ScorePanel scorePanel, long playerId, int playerType) {
         this.scorePanel = scorePanel;
         this.playerId = playerId;
-        this.gameRoom = gameRoom;
         this.playerType = playerType;
 
         setLayout(new GridBagLayout());
@@ -54,11 +49,11 @@ public class CardPanel extends JPanel {
 
         // 레드 카드
         Image scaledImage1 = new ImageIcon("images/CARD_RED.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
-        red = new ImageIcon(scaledImage1);
+        redCardImg = new ImageIcon(scaledImage1);
 
         // 그린 카드
         Image scaledImage2 = new ImageIcon("images/CARD_GREEN.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
-        green = new ImageIcon(scaledImage2);
+        greenCardImg = new ImageIcon(scaledImage2);
 
         // 초기 카드 배치
         for(int i = 0; i < 24; i++) {
@@ -68,10 +63,10 @@ public class CardPanel extends JPanel {
 
             if(i / 3 % 2 == 0) {
                 // 왼쪽에 레드 카드만 배치 
-                cardLabel = new CardLabel(new ImageIcon(red.getImage()), RED_CARD);
+                cardLabel = new CardLabel(new ImageIcon(redCardImg.getImage()), RED_CARD);
             } else {
                 // 오른쪽에 그린 카드만 배치
-                cardLabel = new CardLabel(new ImageIcon(green.getImage()), GREEN_CARD);
+                cardLabel = new CardLabel(new ImageIcon(greenCardImg.getImage()), GREEN_CARD);
             }
 
             cardLabel.setBackground(Color.black);
@@ -85,7 +80,7 @@ public class CardPanel extends JPanel {
                     String location = String.valueOf(x) + "," + String.valueOf(y); // 카드 좌표를 문자열로 전송
                     // 플레이어1이고 레드 카드를 뒤집으면 스코어 업데이트하고 그린 카드로 변경
                     if (playerType == PLAYER1 && cardLabel.getColorState() == RED_CARD) {
-                        updateCardData(cardLabel, green, GREEN_CARD);
+                        updateCardData(cardLabel, greenCardImg, GREEN_CARD);
                         cardColor = GREEN_CARD;
                         updateScore(playerType);
 
@@ -94,7 +89,7 @@ public class CardPanel extends JPanel {
 
                     // 플레이어2이고 그린 카드를 뒤집으면 스코어 업데이트하고 레드 카드로 변경
                     else if(playerType == PLAYER2 && cardLabel.getColorState() == GREEN_CARD) {
-                        updateCardData(cardLabel, red, RED_CARD);
+                        updateCardData(cardLabel, redCardImg, RED_CARD);
                         cardColor = RED_CARD;
                         updateScore(playerType);
                         sendFlipCardData(location);
@@ -111,53 +106,10 @@ public class CardPanel extends JPanel {
         }
 
         // 상대방이 보낸 카드 업데이트 메시지 받아 처리하는 스레드
-        Thread updateCardThread = new Thread(() -> {
-            while (true) {
-                DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.CARD_UI_UPDATE_SERVER);
-
-                Map<String, Object> response = dataTranslator.receiveData();
-                String command = (String) response.get("command");
-                long senderId = (long) response.get("senderId"); // 카드 뒤집은 플레이어 ID
-
-                if (command.equals(CARD_UPDATE) && senderId != playerId) { // 상대방이 보낸 카드 업데이트 메시지일 때만 처리
-                    String location[] = ((String) response.get("location")).split(","); // 뒤집은 카드 좌표
-                    int x = Integer.valueOf(location[0]);
-                    int y = Integer.valueOf(location[1]);
-                    System.out.println("loc: " + x + ", " + y);
-
-                    CardLabel cardLabel = cardLabels[y][x];  // 배열에서 카드 레이블 찾기
-                    ImageIcon img = (playerId == gameRoom.getLeader().getId()) ? red : green;  // 플레이어가 방장이면 해당 위치의 카드를 green 이미지로 변경
-                    int targetColor = (playerId == gameRoom.getLeader().getId()) ? RED_CARD : GREEN_CARD;// 플레이어가 방장이면 카드를 초록색으로 변경
-                    int changeScoreTarget = (playerType == PLAYER1) ? PLAYER2 : PLAYER1; // 상대방 스코어 변경
-
-                    updateCardData(cardLabel, img, targetColor);  // 카드 색 변경
-                    updateScore(changeScoreTarget); // 스코어 업데이트
-                }
-            }
-        });
-
-        updateCardThread.start();
+        new CardUpdateThread(this).start();
 
         // 상대방이 보낸 아이템 정보 메시지 받아 처리하는 스레드
-        Thread updateItemThread = new Thread(() -> {
-            while (true) {
-                DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ITEM_UI_UPDATE_SERVER);
-
-                Map<String, Object> response = dataTranslator.receiveData();
-                String command = (String) response.get("command");
-                long senderId = (long) response.get("senderId"); // 카드 뒤집은 플레이어 ID
-
-                switch (command){
-                    case RANDOM_FLIP: {
-                        boolean[] randomCardArray = (boolean[]) response.get("randomCardArray");
-                        setCardsByBoolArray(randomCardArray);
-                        updateScoreByRandomFilp(senderId, randomCardArray);
-                    }
-                }
-            }
-        });
-
-        updateItemThread.start();
+        new ItemEffectThread(this).start();
     }
 
     // 기본 requset 객체 생성 메서드
@@ -176,26 +128,32 @@ public class CardPanel extends JPanel {
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 
-    // 랜덤 뒤집개로 카드 뒤집었을 때 서버로 전송하는 메서드
+    // 랜덤 뒤집개로 카드 뒤집었을 때 서버에 아이템 사용 알림
     public void sendRandomFlipData(boolean[] randomCardArray){
-        /* 요청 객체를 만들어 GameDataStatusUIUpdateServerThread 로 전송 */
+        /* 요청 객체를 만들어 ItemUIUpdateServer 로 전송 */
         Map<String, Object> request = setDefaultRequest(RANDOM_FLIP);
         request.put("randomCardArray", randomCardArray); // 랜덤 카드 좌표 데이터 전송
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 
-    // 랜덤 뒤집개 아이템 사용 시 카드 뒤집는 메서드
-    public void setCardsByBoolArray(boolean[] randomCardArray) {
+    // 황금 뒤집개로 카드 뒤집었을 때 서버에 아이템 사용 알림
+    public void sendGoldFlipData(){
+        Map<String, Object> request = setDefaultRequest(GOLD_FLIP);
+        MainFrame.dataTranslatorWrapper.broadcast(request);
+    }
+
+    // 랜덤, 황금 뒤집개 아이템 사용 시 카드 뒤집는 메서드
+    public void setCardsByBoolArray(boolean[] cardArray) {
 
         for(int i = 0; i < 24; i++) {
             int x = i % 6; // 카드 x좌표
             int y = i / 6; // 카드 y좌표
 
-            // randomBoolArray의 값에 따라 카드 색상 설정
-            if(randomCardArray[i]) { // true이면 레드 카드
-                updateCardData(cardLabels[y][x], red, RED_CARD);
+            // cardArray 값에 따라 카드 색상 설정
+            if(cardArray[i]) { // true이면 레드 카드
+                updateCardData(cardLabels[y][x], redCardImg, RED_CARD);
             } else { // false이면 그린 카드
-                updateCardData(cardLabels[y][x], green, GREEN_CARD);
+                updateCardData(cardLabels[y][x], greenCardImg, GREEN_CARD);
             }
         }
     }
@@ -207,9 +165,11 @@ public class CardPanel extends JPanel {
     }
 
     // 스코어 업데이트하는 메서드
-    public void updateScore(int changeScoreTarget){
-        scorePanel.updateScore(changeScoreTarget);
+    public void updateScore(int target){
+        scorePanel.updateScore(target);
     }
+
+    public void addScore(int score, int playerType) {scorePanel.addScore(score * 10, playerType);}
 
     public void updateScoreByRandomFilp(long senderId, boolean[] randomCardArray){
         int redScore = 0;

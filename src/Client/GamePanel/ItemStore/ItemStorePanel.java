@@ -17,19 +17,19 @@ public class ItemStorePanel extends JPanel {
     static final int ITEM_COUNT = 6;
 
     // 패널 생성
-    JPanel storeImagePanel = ItemStoreImagePanel.getInstance();
-    JPanel descriptionPanel = ItemDescriptionPanel.getInstance();
-    JPanel inUsePanel = ItemInUsePanel.getInstance();
-    JPanel purchasePanel;
+    private ItemStoreImagePanel storeImagePanel = new ItemStoreImagePanel();
+    private ItemDescriptionPanel descriptionPanel = new ItemDescriptionPanel();
+    private ItemInUsePanel inUsePanel = new ItemInUsePanel();
+    private JPanel purchasePanel;
 
     private ScorePanel scorePanel;
 
     public ItemStorePanel(ScorePanel scorePanel, CardPanel cardPanel){
 
         this.scorePanel = scorePanel;
-        purchasePanel = new ItemPurchasePanel(scorePanel, cardPanel);
+        purchasePanel = new ItemPurchasePanel(scorePanel, cardPanel, descriptionPanel, inUsePanel);
 
-        // BoxLayout을 생성하고, 이를 수직으로 설정
+        // BoxLayout 생성하고, 이를 수직으로 설정
         setLayout(null);
 
         // 패널 붙이기
@@ -37,6 +37,14 @@ public class ItemStorePanel extends JPanel {
         setPanelProperties(descriptionPanel, 100,100);
         setPanelProperties(purchasePanel, 200,400);
         setPanelProperties(inUsePanel, 600, 161);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                revalidate();
+                repaint();
+            }
+        });
     }
 
     // 패널 붙이는 메서드

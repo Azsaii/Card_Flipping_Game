@@ -49,11 +49,11 @@ class RoomControlUIUpdateServerThread extends ServerThread {
                 throw new RuntimeException(e);
             }
 
-            System.out.println("RoomControlUIUpdateServerThread 실행 " + this);
+            /* 요청을 받아 처리 */
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
-            Map<String, Object> request = dataTranslator.receiveData();
             String command = (String) request.get("command");
-
             if (command.equals("방 입장") || command.equals("게임 준비") || command.equals("게임 준비 미완료") | command.equals("방 나가기")) {
 
                 long roomId = (long) request.get("roomId");
@@ -81,6 +81,19 @@ class RoomControlUIUpdateServerThread extends ServerThread {
                         playerDataTranslator.sendData(response);
                     }
                 }
+            } else if (command.equals("게임 시작")) { // 버튼 초기화를 위함
+                long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 id 가져옴.
+                GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
+                Map<String, Object> response = new HashMap<>();
+                response.put("command", "init_btn");
+
+                List<Player> players = gameRoom.getPlayers();
+
+                for(Player player : players) {
+                    DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
+                    playerDataTranslator.sendData(response);
+                }
+
             }
         }
     }

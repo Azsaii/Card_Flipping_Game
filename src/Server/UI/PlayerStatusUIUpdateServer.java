@@ -9,6 +9,7 @@ import Server.Manager.PlayerManager;
 import Server.ServerTemplate;
 import Server.ServerThread;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +54,11 @@ class PlayerStatusUIUpdateServerThread extends ServerThread {
                 throw new RuntimeException(e);
             }
 
-            System.out.println("PlayerStatusUIUpdateServerThread 실행 " + this);
-            Map<String, Object> request = dataTranslator.receiveData();
-            String command = (String) request.get("command");
+            /* 요청을 받아 처리 */
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
+            String command = (String) request.get("command");
             if (command.equals("방 생성") || command.equals("게임 준비") || command.equals("게임 준비 미완료") || command.equals("방 입장") || command.equals("방 나가기")) {
 
                 Map<String, Object> response = new HashMap<>();

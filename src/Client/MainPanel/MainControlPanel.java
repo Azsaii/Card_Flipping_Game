@@ -3,6 +3,9 @@ package Client.MainPanel;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * 메인화면 채팅 패널, 방생성/나가기 버튼이 있는 패널을 붙이는 패널
+ */
 public class  MainControlPanel extends JPanel {
 
 
@@ -10,7 +13,6 @@ public class  MainControlPanel extends JPanel {
     private MainChatPanel mainChatPanel;
 
     public MainControlPanel() {
-
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));

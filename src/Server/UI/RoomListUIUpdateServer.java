@@ -55,12 +55,11 @@ class RoomListUIUpdateServerThread extends ServerThread {
                 throw new RuntimeException(e);
             }
 
-            System.out.println("RoomListUIUpdateServerThread 실행" + this);
+            /* 요청을 받아 처리 */
+            Map<String, Object> request = checkexit();
+            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
-
-            Map<String, Object> request = dataTranslator.receiveData();
             String command = (String) request.get("command");
-
             if (command.equals("방 생성") || command.equals("방 입장") || command.equals("방 나가기")) {
 
                 Map<String, Object> response = new HashMap<>();
@@ -72,6 +71,7 @@ class RoomListUIUpdateServerThread extends ServerThread {
                 List<Player> players = gameWaitingRoom.getPlayers();
 
                 for (Player player : players) {  //대기 방에 있는 모든 플레이어에 방 목록을 데이터를 보냅니다.
+                    System.out.println("playerId = " + player.getId());
                     DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ROOM_LIST_UI_UPDATE_SERVER);
                     playerDataTranslator.sendData(response);
                 }
