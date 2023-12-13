@@ -30,8 +30,8 @@ public class DataTranslator{
     //request 매핑 정보를 보내는 함수
     public synchronized void sendData(Map<String, Object> request) {
         try {
+            out.reset(); // 초기화 먼저 해야 오류안남.
             out.writeObject(request);
-            out.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -41,12 +41,8 @@ public class DataTranslator{
     public Map<String, Object> receiveData() {
         try {
             Object obj = in.readObject();
-
-            if (obj instanceof Map) {
-                return (Map<String, Object>) obj;
-            } else {
-                throw new IllegalArgumentException("Received object is not a map");
-            }
+            if(obj instanceof Map) return (Map<String, Object>) obj;
+            else {System.out.println("Response object is not map");}
         }catch (IOException e) {
             System.out.println("Input stream is closed or no data available.");
             return null;  // 스트림이 닫힌 경우 null 반환

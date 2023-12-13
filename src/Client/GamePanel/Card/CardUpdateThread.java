@@ -28,6 +28,7 @@ public class CardUpdateThread extends Thread{
     }
     @Override
     public void run(){
+
         while (true) {
             DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.CARD_UI_UPDATE_SERVER);
 
@@ -41,7 +42,6 @@ public class CardUpdateThread extends Thread{
                 String location[] = ((String) response.get("location")).split(","); // 뒤집은 카드 좌표
                 int x = Integer.valueOf(location[0]);
                 int y = Integer.valueOf(location[1]);
-                System.out.println("loc: " + x + ", " + y);
 
                 CardLabel cardLabel = cardLabels[y][x];  // 배열에서 카드 레이블 찾기
                 ImageIcon img = (playerId == gameRoom.getLeader().getId()) ? cardPanel.redCardImg : cardPanel.greenCardImg;  // 플레이어가 방장이면 해당 위치의 카드를 green 이미지로 변경

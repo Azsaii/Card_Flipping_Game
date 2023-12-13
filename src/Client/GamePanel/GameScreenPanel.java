@@ -50,7 +50,7 @@ public class GameScreenPanel extends JPanel {
         scorePanel = new ScorePanel();
         cardPanel = new CardPanel(scorePanel, playerId, playerType);
         itemStorePanel = new ItemStorePanel(scorePanel, cardPanel, playerType);
-        timeLimitPanel = new GameTimerLimitPanel(scorePanel, playerType);
+        timeLimitPanel = new GameTimerLimitPanel(scorePanel, cardPanel, playerType);
 
         setPanelProperties(itemStorePanel, 0, 0, 350, 800);
         setPanelProperties(scorePanel, 350, 0, 800, 100);

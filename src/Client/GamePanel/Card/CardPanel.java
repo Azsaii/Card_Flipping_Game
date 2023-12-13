@@ -31,6 +31,9 @@ public class CardPanel extends JPanel {
     public ImageIcon redCardImg;
     public ImageIcon greenCardImg;
 
+    private CardUpdateThread cardUpdateThread;
+    private ItemEffectThread itemEffectThread;
+
     /**
      * 카드 관련 전담 패널
      * 카드 클릭 시 화면을 업데이트하고 상대방에게 뒤집은 카드 위치정보 전달
@@ -106,10 +109,12 @@ public class CardPanel extends JPanel {
         }
 
         // 상대방이 보낸 카드 업데이트 메시지 받아 처리하는 스레드
-        new CardUpdateThread(this).start();
+        cardUpdateThread = new CardUpdateThread(this);
+        cardUpdateThread.start();
 
         // 상대방이 보낸 아이템 정보 메시지 받아 처리하는 스레드
-        new ItemEffectThread(this).start();
+        itemEffectThread = new ItemEffectThread(this);
+        itemEffectThread.start();
     }
 
     // 기본 requset 객체 생성 메서드
@@ -192,5 +197,10 @@ public class CardPanel extends JPanel {
                 case PLAYER2: scorePanel.addScore(greenScore * -1, PLAYER2); break;
             }
         }
+    }
+
+    public void closeGameThread(){
+        cardUpdateThread.stop();
+        itemEffectThread.stop();
     }
 }

@@ -71,7 +71,6 @@ class RoomListUIUpdateServerThread extends ServerThread {
                 List<Player> players = gameWaitingRoom.getPlayers();
 
                 for (Player player : players) {  //대기 방에 있는 모든 플레이어에 방 목록을 데이터를 보냅니다.
-                    System.out.println("playerId = " + player.getId());
                     DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ROOM_LIST_UI_UPDATE_SERVER);
                     playerDataTranslator.sendData(response);
                 }

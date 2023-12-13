@@ -71,7 +71,6 @@ public class GameRoomManager {
         gameRoom.leave(player);
     }
 
-
     public String getRoomsList() {
 
         String[][] rooms = new String[gameRooms.size()][2];

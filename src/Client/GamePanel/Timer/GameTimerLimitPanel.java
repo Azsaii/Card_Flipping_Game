@@ -1,5 +1,6 @@
 package Client.GamePanel.Timer;
 
+import Client.GamePanel.Card.CardPanel;
 import Client.GamePanel.Score.ScorePanel;
 import Client.MainFrame;
 
@@ -19,10 +20,12 @@ public class GameTimerLimitPanel extends JPanel {
     private Timer timer;
 
     private ScorePanel scorePanel;
+    private CardPanel cardPanel;
     private int playerType;
 
-    public GameTimerLimitPanel(ScorePanel scorePanel, int playerType) {
+    public GameTimerLimitPanel(ScorePanel scorePanel, CardPanel cardPanel, int playerType) {
         this.scorePanel = scorePanel;
+        this.cardPanel = cardPanel;
         this.playerType = playerType;
 
         timeLimitLabel = new JLabel();
@@ -55,9 +58,6 @@ public class GameTimerLimitPanel extends JPanel {
                     int otherScore = Integer.valueOf(scorePanel.getScore(1 - playerType));
                     String result;
 
-                    System.out.println("mysc : " + myScore);
-                    System.out.println("othersc : " + otherScore);
-
                     if(myScore == otherScore) result = "비겼습니다.";
                     else result = (myScore > otherScore) ? "승리!!" : "패배했습니다.";
                     result += "\n나의 스코어: " + myScore;
@@ -71,9 +71,9 @@ public class GameTimerLimitPanel extends JPanel {
                             JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,null, options, options[0]);
 
                     // 게임 종료 처리
-                    if (choice == 0 || choice == -1) { // 나가기 버튼을 눌렀거나 x 를 눌렀을 때
+                    if (choice == 0 || choice == -1) { // 다이얼로그의 나가기 버튼을 눌렀거나 x 를 눌렀을 때
+                        // 서버로 종료처리 메시지 전송
                         Map<String, Object> request = new HashMap<>();
-
                         request.put("command", "방 나가기");
                         request.put("playerId", MainFrame.playerId);
                         request.put("roomId", MainFrame.roomId);
@@ -81,6 +81,7 @@ public class GameTimerLimitPanel extends JPanel {
 
                         MainFrame.roomId = 0; //현재 플레이어의 roomId를 0으로 초기화
                         timeLeft = 60; // 타이머 시간 초기화
+                        cardPanel.closeGameThread();
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package Client.GamePanel.ItemStore;
 
 import Client.GamePanel.Card.CardPanel;
+import Client.GamePanel.Score.DefaultScoreStrategy;
 import Server.Data.ItemData;
 import Client.GamePanel.Score.DoubleScoreStrategy;
 import Client.GamePanel.Score.ScorePanel;
@@ -154,7 +155,7 @@ public class ItemPurchasePanel extends JPanel {
                         break;
                     }
                     case 4: { // 더블 이벤트
-                        scorePanel.setStrategy(new DoubleScoreStrategy());
+                        scorePanel.setStrategy(DoubleScoreStrategy.getInstance());
                         break;
                     }
                 }
@@ -172,16 +173,17 @@ public class ItemPurchasePanel extends JPanel {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        // delay 감소 및 cool time 업데이트
+                        // delay 감소 및 쿨타임 업데이트
                         remainingDelay--;
                         inUsePanel.updateCoolTime(itemId);
 
-                        // delay가 0이 되었을 때 종료 처리
+                        // 쿨타임이 끝났을 때 종료 처리
                         if (remainingDelay <= 0) {
-                            itemActivated[i] = true;
-                            setImage(source[0], i, itemDatas[i].getItemPath());
-                            inUseItemDataCount--;
-                            inUsePanel.detachInUseItem(itemDatas[i].getItemId());
+                            itemActivated[i] = true; // 아이템 활성화
+                            setImage(source[0], i, itemDatas[i].getItemPath()); // 아이템 활성화 이미지로 세팅
+                            inUseItemDataCount--; // 아이템 사용 수 감소
+                            inUsePanel.detachInUseItem(itemId); // 아이템 사용 패널에서 제거
+                            removeItemEffect(itemId); // 아이템 효과 제거
                             timer.stop();
                         }
                     }
@@ -204,5 +206,12 @@ public class ItemPurchasePanel extends JPanel {
         Font labelFont = itemLabel.getFont();
         itemLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, 20)); // 글꼴 크기를 20으로 설정
         itemPanel.add(itemLabel, pos);
+    }
+
+    // 아이템 효과 제거 메서드
+    private void removeItemEffect(int itemId){
+        switch (itemId) {
+            case 4:{scorePanel.setStrategy(DefaultScoreStrategy.getInstance());}
+        }
     }
 }

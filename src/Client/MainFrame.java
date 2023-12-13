@@ -149,7 +149,10 @@ public class MainFrame extends JFrame {
                 cardLayout.show(mainPanel, "roomScreenPanel");
                 break;
             case GAMESCREEN:
+                mainPanel.remove(gameScreenPanel);
+                gameScreenPanel = new GameScreenPanel(playerId);
                 gameScreenPanel.startGameRoom();
+                mainPanel.add(gameScreenPanel, "gameScreenPanel");
                 cardLayout.show(mainPanel, "gameScreenPanel");
                 break;
         }
