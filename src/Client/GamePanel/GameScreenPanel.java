@@ -49,7 +49,7 @@ public class GameScreenPanel extends JPanel {
         // 순서 바꾸면 안된다.
         scorePanel = new ScorePanel();
         cardPanel = new CardPanel(scorePanel, playerId, playerType);
-        itemStorePanel = new ItemStorePanel(scorePanel, cardPanel);
+        itemStorePanel = new ItemStorePanel(scorePanel, cardPanel, playerType);
         timeLimitPanel = new GameTimerLimitPanel(scorePanel, playerType);
 
         setPanelProperties(itemStorePanel, 0, 0, 350, 800);

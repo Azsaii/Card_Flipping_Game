@@ -15,7 +15,7 @@ import static Client.GamePanel.GameScreenPanel.PLAYER2;
 
 public class GameTimerLimitPanel extends JPanel {
     private JLabel timeLimitLabel; // 타이머를 표시할 레이블
-    private int timeLeft = 60; // 남은 시간 (초)
+    private int timeLeft = 120; // 남은 시간 (초)
     private Timer timer;
 
     private ScorePanel scorePanel;

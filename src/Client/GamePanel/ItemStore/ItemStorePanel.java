@@ -24,10 +24,10 @@ public class ItemStorePanel extends JPanel {
 
     private ScorePanel scorePanel;
 
-    public ItemStorePanel(ScorePanel scorePanel, CardPanel cardPanel){
+    public ItemStorePanel(ScorePanel scorePanel, CardPanel cardPanel, int playerType){
 
         this.scorePanel = scorePanel;
-        purchasePanel = new ItemPurchasePanel(scorePanel, cardPanel, descriptionPanel, inUsePanel);
+        purchasePanel = new ItemPurchasePanel(scorePanel, cardPanel, descriptionPanel, inUsePanel, playerType);
 
         // BoxLayout 생성하고, 이를 수직으로 설정
         setLayout(null);

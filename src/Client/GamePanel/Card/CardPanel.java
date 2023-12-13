@@ -48,11 +48,11 @@ public class CardPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
 
         // 레드 카드
-        Image scaledImage1 = new ImageIcon("images/CARD_RED.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
+        Image scaledImage1 = new ImageIcon("images/cards/CARD_RED.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
         redCardImg = new ImageIcon(scaledImage1);
 
         // 그린 카드
-        Image scaledImage2 = new ImageIcon("images/CARD_GREEN.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
+        Image scaledImage2 = new ImageIcon("images/cards/CARD_GREEN.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
         greenCardImg = new ImageIcon(scaledImage2);
 
         // 초기 카드 배치

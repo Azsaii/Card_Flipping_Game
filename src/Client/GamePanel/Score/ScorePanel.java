@@ -8,8 +8,6 @@ import static Client.GamePanel.GameScreenPanel.PLAYER2;
 
 public class ScorePanel extends JPanel {
 
-    private long playerType = PLAYER1;   // 플레이어 방장/참여자 식별용 데이터. id와는 별개
-
     static final int DEFAULT_SCORE_ADD = 10; // 카드 뒤집을 시 점수
 
     private ScoreStrategy strategy; // 스코어 추가 모드
@@ -43,9 +41,6 @@ public class ScorePanel extends JPanel {
         add(p3);
     }
 
-    public void setPlayerType(long playerType) {
-        this.playerType = playerType;
-    }
     public void setStrategy(ScoreStrategy strategy) {
         this.strategy = strategy;
     }
@@ -60,7 +55,7 @@ public class ScorePanel extends JPanel {
         panel.add(scoreLable);
     }
 
-    // 스코어 추가
+    // 스코어 추가, 소모
     public void addScore(int score, int playerType) {
         JLabel targetLable = score1;
         if(playerType == PLAYER1) targetLable = score1;
