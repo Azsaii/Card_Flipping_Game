@@ -41,8 +41,12 @@ public class DataTranslator{
     public Map<String, Object> receiveData() {
         try {
             Object obj = in.readObject();
-            if(obj instanceof Map) return (Map<String, Object>) obj;
-            else {System.out.println("Response object is not map");}
+
+            if (obj instanceof Map) {
+                return (Map<String, Object>) obj;
+            } else {
+                throw new IllegalArgumentException("Received object is not a map");
+            }
         }catch (IOException e) {
             System.out.println("Input stream is closed or no data available.");
             return null;  // 스트림이 닫힌 경우 null 반환

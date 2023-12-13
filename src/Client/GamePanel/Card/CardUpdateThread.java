@@ -48,8 +48,8 @@ public class CardUpdateThread extends Thread{
                 int targetColor = (playerId == gameRoom.getLeader().getId()) ? RED_CARD : GREEN_CARD;// 플레이어가 방장이면 카드를 초록색으로 변경
                 int changeScoreTarget = (cardPanel.playerType == PLAYER1) ? PLAYER2 : PLAYER1; // 상대방 스코어 변경
 
-                cardPanel.updateCardData(cardLabel, img, targetColor);  // 카드 색 변경
-                cardPanel.updateScore(changeScoreTarget); // 스코어 업데이트
+                cardPanel.updateCardData(cardLabel, img, targetColor); // 카드 색 변경
+                cardPanel.addCardScore(changeScoreTarget); // 스코어 업데이트
             }
         }
     }

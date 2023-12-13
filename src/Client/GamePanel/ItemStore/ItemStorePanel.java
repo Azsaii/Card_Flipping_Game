@@ -20,7 +20,7 @@ public class ItemStorePanel extends JPanel {
     private ItemStoreImagePanel storeImagePanel = new ItemStoreImagePanel();
     private ItemDescriptionPanel descriptionPanel = new ItemDescriptionPanel();
     private ItemInUsePanel inUsePanel = new ItemInUsePanel();
-    private JPanel purchasePanel;
+    private ItemPurchasePanel purchasePanel;
 
     private ScorePanel scorePanel;
 
@@ -28,6 +28,7 @@ public class ItemStorePanel extends JPanel {
 
         this.scorePanel = scorePanel;
         purchasePanel = new ItemPurchasePanel(scorePanel, cardPanel, descriptionPanel, inUsePanel, playerType);
+        cardPanel.setItemPurchasePanel(purchasePanel); // 아이스에이지 효과 함수 호출을 위함
 
         // BoxLayout 생성하고, 이를 수직으로 설정
         setLayout(null);

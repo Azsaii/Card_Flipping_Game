@@ -1,5 +1,6 @@
 package Client.GamePanel.Card;
 
+import Client.GamePanel.ItemStore.ItemPurchasePanel;
 import Client.GamePanel.Score.ScorePanel;
 import Client.MainFrame;
 
@@ -18,21 +19,25 @@ public class CardPanel extends JPanel {
     static final int RED_CARD = 3;
     static final int GREEN_CARD = 4;
     static final String CARD_UPDATE = "CARD_UPDATE";
-    static final String RANDOM_FLIP = "RANDOM_FLIP";
-    static final String GOLD_FLIP = "GOLD_FLIP";
-    static final String DOUBLE_EVENT = "DOUBLE_EVENT";
-    static final String ICE_AGE = "ICE_AGE";
+    public static final String COMMAND_RANDOM_FLIP = "RANDOM_FLIP";
+    public static final String COMMAND_GOLD_FLIP = "GOLD_FLIP";
+    public static final String COMMAND_DOUBLE_EVENT = "DOUBLE_EVENT";
+    public static final String COMMAND_ICE_AGE = "ICE_AGE";
 
     public long playerId;
     public int playerType; // 1p / 2p 구분. 0, 1
     private ScorePanel scorePanel;
+    private ItemPurchasePanel itemPurchasePanel;
     public final CardLabel[][] cardLabels = new CardLabel[4][6];  // 4행 6열의 카드 배열
 
     public ImageIcon redCardImg;
     public ImageIcon greenCardImg;
+    public ImageIcon iceAgeCardImg;
 
     private CardUpdateThread cardUpdateThread;
     private ItemEffectThread itemEffectThread;
+
+    public boolean isUnClickable = false; // 카드 뒤집을 수 있는지 여부. false일 때 뒤집기 가능
 
     /**
      * 카드 관련 전담 패널
@@ -58,6 +63,10 @@ public class CardPanel extends JPanel {
         Image scaledImage2 = new ImageIcon("images/cards/CARD_GREEN.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
         greenCardImg = new ImageIcon(scaledImage2);
 
+        // 아이스 에이지 카드
+        Image scaledImage4 = new ImageIcon("images/cards/CARD_ICE.JPG").getImage().getScaledInstance(78, 110, Image.SCALE_DEFAULT);
+        iceAgeCardImg = new ImageIcon(scaledImage4);
+
         // 초기 카드 배치
         for(int i = 0; i < 24; i++) {
             CardLabel cardLabel;
@@ -79,14 +88,16 @@ public class CardPanel extends JPanel {
             cardLabel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+
+                    if(isUnClickable) return; // 아이스 에이지 아이템 사용 상태인 경우 카드 뒤집기 불가
+
                     int cardColor = 0;
                     String location = String.valueOf(x) + "," + String.valueOf(y); // 카드 좌표를 문자열로 전송
                     // 플레이어1이고 레드 카드를 뒤집으면 스코어 업데이트하고 그린 카드로 변경
                     if (playerType == PLAYER1 && cardLabel.getColorState() == RED_CARD) {
                         updateCardData(cardLabel, greenCardImg, GREEN_CARD);
                         cardColor = GREEN_CARD;
-                        updateScore(playerType);
-
+                        addCardScore(playerType);
                         sendFlipCardData(location);
                     }
 
@@ -94,7 +105,7 @@ public class CardPanel extends JPanel {
                     else if(playerType == PLAYER2 && cardLabel.getColorState() == GREEN_CARD) {
                         updateCardData(cardLabel, redCardImg, RED_CARD);
                         cardColor = RED_CARD;
-                        updateScore(playerType);
+                        addCardScore(playerType);
                         sendFlipCardData(location);
                     }
                 }
@@ -107,14 +118,20 @@ public class CardPanel extends JPanel {
 
             add(cardLabel, gbc);
         }
+    }
 
+    public void startUpdateThread(){
         // 상대방이 보낸 카드 업데이트 메시지 받아 처리하는 스레드
         cardUpdateThread = new CardUpdateThread(this);
         cardUpdateThread.start();
 
         // 상대방이 보낸 아이템 정보 메시지 받아 처리하는 스레드
-        itemEffectThread = new ItemEffectThread(this);
+        itemEffectThread = new ItemEffectThread(this, scorePanel, itemPurchasePanel);
         itemEffectThread.start();
+    }
+
+    public void setItemPurchasePanel(ItemPurchasePanel itemPurchasePanel) {
+        this.itemPurchasePanel = itemPurchasePanel;
     }
 
     // 기본 requset 객체 생성 메서드
@@ -130,20 +147,6 @@ public class CardPanel extends JPanel {
         /* 요청 객체를 만들어 CardUIUpdateServer 로 전송 */
         Map<String, Object> request = setDefaultRequest(CARD_UPDATE);
         request.put("location", location); // 뒤집은 카드 좌표 데이터 추가
-        MainFrame.dataTranslatorWrapper.broadcast(request);
-    }
-
-    // 랜덤 뒤집개로 카드 뒤집었을 때 서버에 아이템 사용 알림
-    public void sendRandomFlipData(boolean[] randomCardArray){
-        /* 요청 객체를 만들어 ItemUIUpdateServer 로 전송 */
-        Map<String, Object> request = setDefaultRequest(RANDOM_FLIP);
-        request.put("randomCardArray", randomCardArray); // 랜덤 카드 좌표 데이터 전송
-        MainFrame.dataTranslatorWrapper.broadcast(request);
-    }
-
-    // 황금 뒤집개로 카드 뒤집었을 때 서버에 아이템 사용 알림
-    public void sendGoldFlipData(){
-        Map<String, Object> request = setDefaultRequest(GOLD_FLIP);
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 
@@ -169,33 +172,74 @@ public class CardPanel extends JPanel {
         cardLabel.setColorState(targetColor);
     }
 
-    // 스코어 업데이트하는 메서드
-    public void updateScore(int target){
-        scorePanel.updateScore(target);
-    }
+    public void addScore(int score, int playerType) {scorePanel.addScore(score, playerType);}
 
-    public void addScore(int score, int playerType) {scorePanel.addScore(score * 10, playerType);}
+    public void addCardScore(int playerType) {scorePanel.addCardScore(playerType);}
 
     public void updateScoreByRandomFilp(long senderId, boolean[] randomCardArray){
-        int redScore = 0;
-        int greenScore;
+        int afterRed = 0;
 
+        // 랜덤 뒤집게 적용 후 카드 수 구하기
         for(boolean b : randomCardArray) {
-            if(b == true) redScore++;
+            if(b == true) afterRed++;
         }
-        redScore *= 10;
-        greenScore = 240 - redScore;
+        int afterGreen = 24 - afterRed;
 
-        if(senderId == playerId) { // 본인이 랜덤뒤집개 사용한 경우 뒤집은 수만큼 스코어를 얻는다.
+        // 본인이 랜덤 뒤집개 사용한 경우 상대 카드 뒤집은 수만큼 스코어를 얻는다.
+        // 내가 아이템을 사용한 경우, 내가 얻은 스코어만큼 상대는 스코어를 잃는다.
+        if(senderId == playerId) {
             switch(playerType){
-                case PLAYER1: scorePanel.addScore(greenScore, PLAYER1); break;
-                case PLAYER2: scorePanel.addScore(redScore, PLAYER2); break;
+                case PLAYER1: {
+                    scorePanel.addScore(afterGreen, PLAYER1);
+                    scorePanel.addScore(afterGreen * -1, PLAYER2);
+                    break;
+                }
+                case PLAYER2: {
+                    scorePanel.addScore(afterRed, PLAYER2);
+                    scorePanel.addScore(afterRed * -1, PLAYER1);
+                    break;
+                }
             }
         } else { // 상대가 랜덤 뒤집개 사용한 경우 상대가 스코어를 얻은만큼 스코어를 잃는다.
             switch(playerType){
-                case PLAYER1: scorePanel.addScore(redScore * -1, PLAYER1); break;
-                case PLAYER2: scorePanel.addScore(greenScore * -1, PLAYER2); break;
+                case PLAYER1: {
+                    scorePanel.addScore(afterRed, PLAYER2); // 상대 스코어 증가
+                    scorePanel.addScore(afterRed * -1, PLAYER1); // 내 스코어 감소
+                    break;
+                }
+                case PLAYER2: {
+                    scorePanel.addScore(afterGreen, PLAYER1);
+                    scorePanel.addScore(afterGreen * -1, PLAYER2);
+                    break;
+                }
             }
+        }
+    }
+
+    // 아이스 에이지 아이템 사용 시 호출되는 메서드
+    // 모든 카드를 ice 카드로 변경한다.
+    public void activeCardIceAge(){
+        isUnClickable = true; // 카드 뒤집기 비활성화
+
+        for(int i = 0; i < 24; i++) {
+            int x = i % 6; // 카드 x좌표
+            int y = i / 6; // 카드 y좌표
+            CardLabel cardLabel = cardLabels[y][x];
+
+            updateCardData(cardLabel, iceAgeCardImg, cardLabel.getColorState());
+        }
+    }
+
+    // 아이스 에이지 아이템 사용 종료 후 원래대로 돌리는 메서드
+    public void deActiveCardIceAge(){
+        isUnClickable = false; // 카드 뒤집기 활성화
+
+        for(int i = 0; i < 24; i++) {
+            int x = i % 6; // 카드 x좌표
+            int y = i / 6; // 카드 y좌표
+            CardLabel cardLabel = cardLabels[y][x];
+            ImageIcon img = (cardLabels[y][x].getColorState() == RED_CARD) ? redCardImg : greenCardImg;
+            updateCardData(cardLabel, img, cardLabel.getColorState());
         }
     }
 

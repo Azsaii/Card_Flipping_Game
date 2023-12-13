@@ -10,13 +10,15 @@ public class ScorePanel extends JPanel {
 
     static final int DEFAULT_SCORE_ADD = 10; // 카드 뒤집을 시 점수
 
-    private ScoreStrategy strategy; // 스코어 추가 모드
+    private ScoreStrategy strategy1; // p1 스코어 추가 모드
+    private ScoreStrategy strategy2; // p2 스코어 추가 모드
 
     JLabel score1;  // 플레이어1 스코어
     JLabel score2;  // 플레이어2 스코어
 
     public ScorePanel() {
-        strategy = new DefaultScoreStrategy();  // 게임모드 초기화
+        strategy1 = new DefaultScoreStrategy();  // 게임모드 초기화
+        strategy2 = new DefaultScoreStrategy();  // 게임모드 초기화
 
         setLayout(new GridLayout(0,3));
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -41,8 +43,9 @@ public class ScorePanel extends JPanel {
         add(p3);
     }
 
-    public void setStrategy(ScoreStrategy strategy) {
-        this.strategy = strategy;
+    public void setStrategy(ScoreStrategy strategy, int playerType) {
+        if(playerType == PLAYER1) strategy1 = strategy;
+        else strategy2 = strategy;
     }
 
     // 패널에 레이블 추가
@@ -57,17 +60,28 @@ public class ScorePanel extends JPanel {
 
     // 스코어 추가, 소모
     public void addScore(int score, int playerType) {
+        ScoreStrategy targetStrategy = (playerType == PLAYER1) ? strategy1 : strategy2;
+
         JLabel targetLable = score1;
         if(playerType == PLAYER1) targetLable = score1;
         else if(playerType == PLAYER2) targetLable = score2;
+        
+        if(score >= 0) score *= targetStrategy.getScore(); // 추가 스코어가 양수인 경우에만 적용
+        else score *= DefaultScoreStrategy.getInstance().getScore();
         
         int newScore = Integer.valueOf(targetLable.getText()) + score;
         targetLable.setText(String.valueOf(newScore));
     }
 
-    // 모드에 따라 스코어 추가
-    public void updateScore(int playerType) {
-        addScore(strategy.getScore(), playerType);
+    // 카드 뒤집었을 때 스코어 추가
+    public void addCardScore(int playerType){
+        ScoreStrategy targetStrategy = (playerType == PLAYER1) ? strategy1 : strategy2;
+        JLabel targetLable = score1;
+        if(playerType == PLAYER1) targetLable = score1;
+        else if(playerType == PLAYER2) targetLable = score2;
+
+        int newScore = Integer.valueOf(targetLable.getText()) + targetStrategy.getScore();
+        targetLable.setText(String.valueOf(newScore));
     }
 
     // 스코어 반환
