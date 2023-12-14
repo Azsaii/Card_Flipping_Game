@@ -151,16 +151,24 @@ public class ItemPurchasePanel extends JPanel {
                         sendRandomFlipData(randomCardArray); // 서버로 카드 데이터 전송
                         break;
                     }
+                    case 2: { // 검은 안개
+                        sendItemUseNotice(COMMAND_BLACK_FOG);
+                        break;
+                    }
                     case 3: { // 황금 뒤집개
-                        sendGoldFlipData();
+                        sendItemUseNotice(COMMAND_GOLD_FLIP);
                         break;
                     }
                     case 4: { // 더블 이벤트
-                        sendDoubleEvent();
+                        sendItemUseNotice(COMMAND_DOUBLE_EVENT);
+                        break;
+                    }
+                    case 5: { // 흡혈
+                        sendItemUseNotice(COMMAND_ABSORB);
                         break;
                     }
                     case 6: { // 아이스 에이지
-                        sendIceAgeEvent();
+                        sendItemUseNotice(COMMAND_ICE_AGE);
                         break;
                     }
                 }
@@ -225,21 +233,9 @@ public class ItemPurchasePanel extends JPanel {
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 
-    // 황금 뒤집개로 카드 뒤집었을 때 서버에 아이템 사용 알림
-    public void sendGoldFlipData(){
-        Map<String, Object> request = cardPanel.setDefaultRequest(COMMAND_GOLD_FLIP);
-        MainFrame.dataTranslatorWrapper.broadcast(request);
-    }
-
-    // 더블 이벤트 사용 시 서버에 아이템 사용 알림
-    public void sendDoubleEvent(){
-        Map<String, Object> request = cardPanel.setDefaultRequest(COMMAND_DOUBLE_EVENT);
-        MainFrame.dataTranslatorWrapper.broadcast(request);
-    }
-
-    // 아이스 에이지 사용 시 서버에 아이템 사용 알림
-    public void  sendIceAgeEvent(){
-        Map<String, Object> request = cardPanel.setDefaultRequest(COMMAND_ICE_AGE);
+    // 검은안개, 황금 뒤집개, 더블 이벤트, 흡혈, 아이스 에이지 아이템 사용 시 서버에 아이템 사용 알림
+    public void sendItemUseNotice(String command){
+        Map<String, Object> request = cardPanel.setDefaultRequest(command);
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 

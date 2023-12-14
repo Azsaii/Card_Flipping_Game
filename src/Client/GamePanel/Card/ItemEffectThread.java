@@ -53,16 +53,7 @@ public class ItemEffectThread extends Thread{
             String command = (String) response.get("command");
             long senderId = (long) response.get("senderId"); // 카드 뒤집은 플레이어 ID
             int senderType = (senderId == playerId) ? playerType : 1-playerType;
-
-            // 아이템 사용하기 전 red, green 카드의 수를 구한다.
-            int redCount = 0; // 기존 red 카드 수
-            for (int i = 0; i < 24; i++){
-                int x = i % 6; // 카드 x좌표
-                int y = i / 6; // 카드 y좌표
-                if(cardLabels[y][x].getColorState() == RED_CARD) redCount++;
-            }
-            int greenCount = 24 - redCount; // 기존 green 카드 수
-
+            System.out.println("client: received msg. command = " + command);
             switch (command){
                 // 랜덤 뒤집개
                 case COMMAND_RANDOM_FLIP: {
@@ -74,24 +65,27 @@ public class ItemEffectThread extends Thread{
                     break;
                 }
 
+                // 검은 안개
+                case COMMAND_BLACK_FOG: {
+                    System.out.println("black fog start");
+                    price = (int)Math.round(BLACK_FOG.getItemPrice() * -0.1);
+                    if(senderId == playerId) continue; // 자신이 사용한 경우 영향 없음
+                    cardPanel.activateBlackFog();
+
+                    int delay = BLACK_FOG.getCoolTime().intValue();
+                    new Timer(delay * 1000, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            cardPanel.deActiveCardEffectByItem(COMMAND_BLACK_FOG);
+                            ((Timer) e.getSource()).stop();
+                        }
+                    }).start();
+                    break;
+                }
+
                 // 황금 뒤집개
                 case COMMAND_GOLD_FLIP: {
-                    boolean state = true;
-                    boolean[] cardArray = new boolean[24];
-
-                    if(playerId == senderId){ // 자신이 사용한 경우
-                        switch(playerType){
-                            case PLAYER1: state = false; cardPanel.addScore(redCount, PLAYER1); break; // 모든 카드를 green 카드로 변경, 기존 red 카드 수만큼 점수 추가
-                            case PLAYER2: state = true; cardPanel.addScore(greenCount, PLAYER2); break; // 모든 카드를 red 카드로 변경, 기존 green 카드 수만큼 점수 추가
-                        }
-                    } else { // 상대가 사용한 경우
-                        switch(playerType){
-                            case PLAYER1: state = true; cardPanel.addScore(greenCount, PLAYER2); break;
-                            case PLAYER2: state = false; cardPanel.addScore(redCount, PLAYER1); break;
-                        }
-                    }
-                    for (int i = 0; i < 24; i++) cardArray[i] = state;
-
+                    boolean[] cardArray = cardPanel.updateScoreByGoldFlip(senderId);
                     cardPanel.setCardsByBoolArray(cardArray);
                     price = (int)Math.round(GOLD_FLIP.getItemPrice() * -0.1);
                     break;
@@ -118,11 +112,12 @@ public class ItemEffectThread extends Thread{
                     cardPanel.activeCardIceAge();
                     itemPurchasePanel.deActiveItemPanel(ICE_AGE.getCoolTime()); // 모든 아이템 구입 불가 처리
                     int delay = ICE_AGE.getCoolTime().intValue();
+                    price = (int)Math.round(ICE_AGE.getItemPrice() * -0.1);
 
                     new Timer(delay * 1000, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            cardPanel.deActiveCardIceAge();
+                            cardPanel.deActiveCardEffectByItem(COMMAND_ICE_AGE);
                             ((Timer) e.getSource()).stop();
                         }
                     }).start();
