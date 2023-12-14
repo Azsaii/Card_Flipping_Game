@@ -82,7 +82,6 @@ class CardUIUpdateServerThread extends ServerThread {
                 List<Player> players = gameRoom.getPlayers();
                 for(Player player : players) { ////현재 플레이어가 속한 게임 방에 필요한 데이터를 보냅니다.
                     DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.CARD_UI_UPDATE_SERVER);
-                    System.out.println("server response: " + response);
                     playerDataTranslator.sendData(response);
                 }
             }

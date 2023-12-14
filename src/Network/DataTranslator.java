@@ -39,20 +39,23 @@ public class DataTranslator{
 
     //request 매핑 정보를 받는 함수
     public Map<String, Object> receiveData() {
-        try {
-            Object obj = in.readObject();
-
-            if (obj instanceof Map) {
-                return (Map<String, Object>) obj;
-            } else {
-                throw new IllegalArgumentException("Received object is not a map");
+        Object obj = null;
+        do {
+            try {
+                obj = in.readObject();
+                if (obj instanceof Map) {
+                    return (Map<String, Object>) obj;
+                }
+                // 메타 데이터일 경우 무시하고 다음 데이터를 읽음
+            } catch (IOException e) {
+                System.out.println("Input stream is closed or no data available.");
+                return null;  // 스트림이 닫힌 경우 null 반환
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
-        }catch (IOException e) {
-            System.out.println("Input stream is closed or no data available.");
-            return null;  // 스트림이 닫힌 경우 null 반환
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        } while (!(obj instanceof Map));  // obj가 Map 형태가 될 때까지 반복
+
+        throw new IllegalArgumentException("Received object is not a map");
     }
 
     // 소켓 close

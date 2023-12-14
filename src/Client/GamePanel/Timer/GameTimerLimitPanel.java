@@ -43,7 +43,7 @@ public class GameTimerLimitPanel extends JPanel {
         }
 
         // 1초마다 이벤트를 발생시키는 타이머를 생성합니다.
-        timer = new Timer(1000, new ActionListener() {
+        timer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timeLeft--; // 남은 시간을 1초 줄입니다.

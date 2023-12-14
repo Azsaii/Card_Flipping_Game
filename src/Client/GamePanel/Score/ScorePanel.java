@@ -62,6 +62,7 @@ public class ScorePanel extends JPanel {
     public void addScore(int score, int playerType) {
         ScoreStrategy targetStrategy = (playerType == PLAYER1) ? strategy1 : strategy2;
 
+        // 반영할 스코어 패널 지정
         JLabel targetLable = score1;
         if(playerType == PLAYER1) targetLable = score1;
         else if(playerType == PLAYER2) targetLable = score2;

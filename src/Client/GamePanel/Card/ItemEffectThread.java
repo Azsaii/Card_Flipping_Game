@@ -67,11 +67,10 @@ public class ItemEffectThread extends Thread{
 
                 // 검은 안개
                 case COMMAND_BLACK_FOG: {
-                    System.out.println("black fog start");
                     price = (int)Math.round(BLACK_FOG.getItemPrice() * -0.1);
-                    if(senderId == playerId) continue; // 자신이 사용한 경우 영향 없음
-                    cardPanel.activateBlackFog();
+                    if(senderId == playerId) break; // 자신이 사용한 경우 영향 없음
 
+                    cardPanel.activateBlackFog();
                     int delay = BLACK_FOG.getCoolTime().intValue();
                     new Timer(delay * 1000, new ActionListener() {
                         @Override
@@ -93,7 +92,6 @@ public class ItemEffectThread extends Thread{
 
                 // 더블 이벤트
                 case COMMAND_DOUBLE_EVENT: {
-
                     int targetPlayer = (senderId == playerId) ? playerType : 1-playerType;
                     scorePanel.setStrategy(DoubleScoreStrategy.getInstance(), targetPlayer);
                     int delay = DOUBLE_EVENT.getCoolTime().intValue();
@@ -105,6 +103,24 @@ public class ItemEffectThread extends Thread{
                             ((Timer) e.getSource()).stop();
                         }
                     }).start();
+                    break;
+                }
+
+                // 크로스
+                case COMMAND_CROSS: {
+                    price = (int)Math.round(CROSS.getItemPrice() * -0.1);
+                    if(senderId != playerId) break; // 상대가 사용한 경우 영향 없음
+
+                    cardPanel.isCrossMode = true; // 크로스 모드 시작
+                    int delay = CROSS.getCoolTime().intValue();
+                    new Timer(delay * 1000, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            cardPanel.isCrossMode = false;
+                            ((Timer) e.getSource()).stop();
+                        }
+                    }).start();
+                    break;
                 }
 
                 // 아이스 에이지
@@ -121,6 +137,7 @@ public class ItemEffectThread extends Thread{
                             ((Timer) e.getSource()).stop();
                         }
                     }).start();
+                    break;
                 }
             }
 

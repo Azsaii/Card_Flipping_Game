@@ -38,11 +38,11 @@ public class ItemPurchasePanel extends JPanel {
 
     // 아이템 데이터
     public static final ItemData RANDOM_FLIP = new ItemData(1, "랜덤 뒤집개", pathDefault + "RANDOM_FLIP.PNG", pathDefault + "RANDOM_FLIP_DE.PNG", 50, "모든 카드를 랜덤 색으로 재배치합니다.\n상대의 카드가 뒤집힌 수만큼 스코어를 빼앗습니다.", 4.0);
-    public static final ItemData BLACK_FOG = new ItemData(2, "검은 안개", pathDefault + "BLACK_FOG.PNG", pathDefault + "BLACK_FOG_DE.PNG", 50, "상대가 랜덤한 절반의 카드 색을 보지 못하게 합니다.", 10.0);
-    public static final ItemData GOLD_FLIP = new ItemData(3, "황금 뒤집개", pathDefault + "GOLD_FLIP.PNG", pathDefault + "GOLD_FLIP_DE.PNG", 100, "모든 카드를 플레이어의 색으로 뒤집습니다.", 7.0);
-    public static final ItemData DOUBLE_EVENT = new ItemData(4, "더블 이벤트", pathDefault + "DOUBLE_EVENT.PNG", pathDefault + "DOUBLE_EVENT_DE.PNG", 100, "n초 동안 모든 방법으로 얻는 스코어 2배가 됩니다.", 10.0);
-    public static final ItemData ABSORB = new ItemData(5, "흡혈", pathDefault + "ABSORB.PNG", pathDefault + "ABSORB_DE.PNG", 150, "n초 동안 상대방이 얻는 스코어를 빼앗습니다.\n상대방에게 사용 여부가 알려지지 않습니다.", 10.0);
-    public static final ItemData ICE_AGE = new ItemData(6, "얼음", pathDefault + "ICE_AGE.PNG", pathDefault + "ICE_AGE_DE.PNG", 70, "n초 동안 모든 카드가 뒤집을 수 없는 상태로 변합니다.", 7.0);
+    public static final ItemData BLACK_FOG = new ItemData(2, "검은 안개", pathDefault + "BLACK_FOG.PNG", pathDefault + "BLACK_FOG_DE.PNG", 50, "10초 동안상대가 랜덤한 절반의 카드 색을 보지 못하게 합니다.", 10.0);
+    public static final ItemData GOLD_FLIP = new ItemData(3, "황금 뒤집개", pathDefault + "GOLD_FLIP.PNG", pathDefault + "GOLD_FLIP_DE.PNG", 70, "모든 카드를 플레이어의 색으로 뒤집습니다.", 7.0);
+    public static final ItemData DOUBLE_EVENT = new ItemData(4, "더블 이벤트", pathDefault + "DOUBLE_EVENT.PNG", pathDefault + "DOUBLE_EVENT_DE.PNG", 100, "10초 동안 모든 방법으로 얻는 스코어 2배가 됩니다.", 10.0);
+    public static final ItemData CROSS = new ItemData(5, "크로스", pathDefault + "CROSS.PNG", pathDefault + "CROSS.PNG", 100, "10초 동안 클릭한 카드의 주변 상하좌우 카드가 같이 뒤집어집니다.", 10.0);
+    public static final ItemData ICE_AGE = new ItemData(6, "얼음", pathDefault + "ICE_AGE.PNG", pathDefault + "ICE_AGE_DE.PNG", 70, "7초 동안 모든 카드가 뒤집을 수 없는 상태로 변합니다.", 7.0);
     private ItemData[] itemDatas = new ItemData[ITEM_COUNT];
     private ItemLabel[] itemLabels = new ItemLabel[ITEM_COUNT];
 
@@ -81,7 +81,7 @@ public class ItemPurchasePanel extends JPanel {
         itemDatas[1] = BLACK_FOG;
         itemDatas[2] = GOLD_FLIP;
         itemDatas[3] = DOUBLE_EVENT;
-        itemDatas[4] = ABSORB;
+        itemDatas[4] = CROSS;
         itemDatas[5] = ICE_AGE;
     }
 
@@ -135,45 +135,17 @@ public class ItemPurchasePanel extends JPanel {
                 final ItemLabel[] source = {(ItemLabel) e.getSource()}; // 클릭된 레이블. 타이머 내부에서 사용하기 위해 final 선언됨
                 int itemId = source[0].getItemId(); // 아이템 id
                 double delay = itemDatas[i].getCoolTime(); // 쿨타임
+                String command = itemDatas[i].getItemPath().split("/")[2].split("\\.")[0]; // 커맨드 알아내기
 
                 // 아이템 사용 패널에 클릭한 아이템 추가되도록 업데이트
                 inUseItemDataCount++;
                 inUsePanel.attachInUseItem(itemDatas[i]);
 
-                // 아이템 효과 로직 호출
-                switch (itemId) {
-                    case 1: { // 랜덤 뒤집개
-                        boolean[] randomCardArray = new boolean[24];
-                        Random rand = new Random();
-                        for(int index = 0; index < randomCardArray.length; index++) {
-                            randomCardArray[index] = rand.nextBoolean();
-                        }
-                        sendRandomFlipData(randomCardArray); // 서버로 카드 데이터 전송
-                        break;
-                    }
-                    case 2: { // 검은 안개
-                        sendItemUseNotice(COMMAND_BLACK_FOG);
-                        break;
-                    }
-                    case 3: { // 황금 뒤집개
-                        sendItemUseNotice(COMMAND_GOLD_FLIP);
-                        break;
-                    }
-                    case 4: { // 더블 이벤트
-                        sendItemUseNotice(COMMAND_DOUBLE_EVENT);
-                        break;
-                    }
-                    case 5: { // 흡혈
-                        sendItemUseNotice(COMMAND_ABSORB);
-                        break;
-                    }
-                    case 6: { // 아이스 에이지
-                        sendItemUseNotice(COMMAND_ICE_AGE);
-                        break;
-                    }
-                }
+                // 아이템 사용을 서버에 알림
+                sendItemUseNotice(command);
 
-                deActiveItemPanel(i, source, delay, itemId); // 클릭된 아이템 비활성화
+                // 클릭된 아이템 비활성화
+                deActiveItemPanel(i, source, delay, itemId); // 클릭된 아이템 비활성화, 쿨타임 처리
             }
         });
 
@@ -225,17 +197,19 @@ public class ItemPurchasePanel extends JPanel {
         timer.start();
     }
 
-    // 랜덤 뒤집개로 카드 뒤집었을 때 서버에 아이템 사용 알림
-    public void sendRandomFlipData(boolean[] randomCardArray){
-        /* 요청 객체를 만들어 ItemUIUpdateServer 로 전송 */
-        Map<String, Object> request = cardPanel.setDefaultRequest(COMMAND_RANDOM_FLIP);
-        request.put("randomCardArray", randomCardArray); // 랜덤 카드 좌표 데이터 전송
-        MainFrame.dataTranslatorWrapper.broadcast(request);
-    }
-
-    // 검은안개, 황금 뒤집개, 더블 이벤트, 흡혈, 아이스 에이지 아이템 사용 시 서버에 아이템 사용 알림
+    // 아이템 사용 시 서버에 아이템 사용 알림
     public void sendItemUseNotice(String command){
         Map<String, Object> request = cardPanel.setDefaultRequest(command);
+
+        if(command == COMMAND_RANDOM_FLIP) {
+            boolean[] randomCardArray = new boolean[24];
+            Random rand = new Random();
+            for(int index = 0; index < randomCardArray.length; index++) {
+                randomCardArray[index] = rand.nextBoolean();
+            }
+            request.put("randomCardArray", randomCardArray); // 전송 데이터에 랜덤 카드 좌표 추가
+        }
+
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 

@@ -43,7 +43,7 @@ class ItemUIUpdateServerThread extends ServerThread {
     static final String BLACK_FOG = "BLACK_FOG";
     static final String GOLD_FLIP = "GOLD_FLIP";
     static final String DOUBLE_EVENT = "DOUBLE_EVENT";
-    static final String ABSORB = "ABSORB";
+    static final String CROSS = "CROSS";
     static final String ICE_AGE = "ICE_AGE";
     public ItemUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
@@ -67,7 +67,7 @@ class ItemUIUpdateServerThread extends ServerThread {
             if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
 
             String command = (String) request.get("command");
-            if(command.equals(RANDOM_FLIP) || command.equals(BLACK_FOG) || command.equals(GOLD_FLIP) || command.equals(DOUBLE_EVENT) || command.equals(ABSORB) ||command.equals(ICE_AGE)){
+            if(command.equals(RANDOM_FLIP) || command.equals(BLACK_FOG) || command.equals(GOLD_FLIP) || command.equals(DOUBLE_EVENT) || command.equals(CROSS) ||command.equals(ICE_AGE)){
 
                 Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 

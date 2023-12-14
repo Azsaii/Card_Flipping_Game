@@ -23,7 +23,7 @@ public class CardPanel extends JPanel {
     public static final String COMMAND_BLACK_FOG = "BLACK_FOG";
     public static final String COMMAND_GOLD_FLIP = "GOLD_FLIP";
     public static final String COMMAND_DOUBLE_EVENT = "DOUBLE_EVENT";
-    public static final String COMMAND_ABSORB = "ABSORB";
+    public static final String COMMAND_CROSS = "CROSS";
     public static final String COMMAND_ICE_AGE = "ICE_AGE";
 
     public long playerId;
@@ -40,8 +40,9 @@ public class CardPanel extends JPanel {
     private CardUpdateThread cardUpdateThread;
     private ItemEffectThread itemEffectThread;
 
-    public boolean isUnClickable = false; // 카드 뒤집을 수 있는지 여부. false일 때 뒤집기 가능
-    public boolean[] isBlind = new boolean[24]; // 검은 안개 효과 적용 여부. 기본적으로 false이다.
+    public boolean isUnClickable = false; // 카드 뒤집을 수 있는지 여부. false 일 때 뒤집기 가능
+    public boolean isCrossMode = false; // 크로스 모드. 기본적으로 false
+    public boolean[] isBlind = new boolean[24]; // 검은 안개 효과 적용 여부. 기본적으로 false
 
     /**
      * 카드 관련 전담 패널
@@ -101,15 +102,21 @@ public class CardPanel extends JPanel {
                 public void mouseClicked(MouseEvent e) {
 
                     if(isUnClickable) return; // 아이스 에이지 아이템 사용 상태인 경우 카드 뒤집기 불가
-
                     String location = String.valueOf(x) + "," + String.valueOf(y); // 카드 좌표를 문자열로 전송
+
                     // 플레이어1이고 레드 카드를 뒤집으면 스코어 업데이트하고 그린 카드로 변경
                     if (playerType == PLAYER1 && cardLabel.getColorState() == RED_CARD) {
-                        if(!isBlind[finalI]) updateCardData(cardLabel, greenCardImg, GREEN_CARD); // 검은 안개 상태가 true이면 색 변경 안함
-                        else updateCardData(cardLabel, blackCardImg, GREEN_CARD);
+                        if(!isBlind[finalI]) {
+                            updateCardData(cardLabel, greenCardImg, GREEN_CARD); // 검은 안개 상태가 true이면 색 변경 안함
+                        }
+                        else {
+                            updateCardData(cardLabel, blackCardImg, GREEN_CARD);
+                        }
 
                         addCardScore(playerType);
                         sendFlipCardData(location);
+
+                        if(isCrossMode) { updateCardCrossMode(x, y, RED_CARD); } // 크로스 모드일 때 처리
                     }
 
                     // 플레이어2이고 그린 카드를 뒤집으면 스코어 업데이트하고 레드 카드로 변경
@@ -119,6 +126,8 @@ public class CardPanel extends JPanel {
 
                         addCardScore(playerType);
                         sendFlipCardData(location);
+
+                        if(isCrossMode) { updateCardCrossMode(x, y, GREEN_CARD); } // 크로스 모드일 때 처리
                     }
                 }
             });
@@ -283,6 +292,41 @@ public class CardPanel extends JPanel {
 
             if (isBlind[i]) { // true이면 블랙 카드. 카드 이미지만 바꾸고 colorState 는 변경하지 않는다.
                 updateCardData(cardLabel, blackCardImg, cardLabel.getColorState());
+            }
+        }
+    }
+
+    // 크로스 아이템 사용 시 클릭한 카드의 상하좌우 카드도 같이 뒤집히도록 처리
+    private void updateCardCrossMode(int x, int y, int cardState){
+        int[][] directions = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}}; // 상, 하, 좌, 우
+        int targetColor = (cardState == RED_CARD) ? GREEN_CARD : RED_CARD;
+        ImageIcon targetimg = (cardState == RED_CARD) ? greenCardImg : redCardImg;
+
+        for(int[] direction : directions) {
+            int newY = y + direction[0];
+            int newX = x + direction[1];
+            int blindIndex = y * 6 + x;
+
+            // 배열 범위를 벗어나지 않는지 확인
+            // 뒤집은 카드와 인접 카드 색이 같은 경우만 처리
+            if(newY >= 0 && newY < 4 && newX >= 0 && newX < 6) {
+                CardLabel adjacentCardLabel = cardLabels[newY][newX];
+                if(adjacentCardLabel.getColorState() != cardState) continue;
+
+                // 카드 스코어 증가
+                scorePanel.addCardScore(playerType);
+
+                // 서버로 뒤집힌 카드 정보 전송
+                String newLocation = String.valueOf(newX) + "," + String.valueOf(newY);
+                sendFlipCardData(newLocation); // 서버로 뒤집힌 카드 정보 전송
+
+                // 검은 안개 아이템 효과 고려해서 색 변경
+                if(!isBlind[blindIndex]) {
+                    updateCardData(adjacentCardLabel, targetimg, targetColor);
+                }
+                else {
+                    updateCardData(adjacentCardLabel, blackCardImg, targetColor);
+                }
             }
         }
     }
