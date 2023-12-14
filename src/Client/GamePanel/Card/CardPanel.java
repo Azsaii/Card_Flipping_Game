@@ -361,7 +361,7 @@ public class CardPanel extends JPanel {
     }
 
     public void closeGameThread(){
-        cardUpdateThread.stop();
-        itemEffectThread.stop();
+        cardUpdateThread.interrupt();
+        itemEffectThread.interrupt();
     }
 }

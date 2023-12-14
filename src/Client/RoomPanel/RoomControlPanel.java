@@ -23,6 +23,8 @@ public class RoomControlPanel extends JPanel {
     ImageIcon readyFillIcon = new ImageIcon("images/ready-icon-fill.png");
     ImageIcon readyOutlineIcon = new ImageIcon("images/ready-icon-outline.png");
 
+    RoomChatPanel roomChatPanel;
+
     // 버튼 상태 초기화 메서드
     public void setInitButtons(){
         readyButton.setEnabled(true);
@@ -30,8 +32,9 @@ public class RoomControlPanel extends JPanel {
         startButton.setEnabled(false);
     }
 
-    RoomControlPanel(long playerId) {
+    RoomControlPanel(long playerId, RoomChatPanel roomChatPanel) {
 
+        this.roomChatPanel = roomChatPanel;
         setLayout(new GridLayout());
 
         final JPanel panel1 = new JPanel();
@@ -122,7 +125,6 @@ public class RoomControlPanel extends JPanel {
                 request.put("command", "게임 시작");
                 request.put("playerId", playerId);
                 request.put("roomId", MainFrame.roomId);
-                System.out.println("roomid=" + MainFrame.roomId);
 
                 MainFrame.dataTranslatorWrapper.broadcast(request);
             }
@@ -166,6 +168,7 @@ public class RoomControlPanel extends JPanel {
                     }
                 } else if(command.equals("init_btn")){ // 버튼 초기화
                     setInitButtons();
+                    roomChatPanel.stopRoomChatThread(); // 채팅 스레드 정지
                 }
             }
         });

@@ -44,7 +44,7 @@ public  class GameDataInitialServer extends ServerTemplate {
 
         GameWaitingRoomManager.getInstance().enter(player); // 처음 게임에 입장한 플레이어는 게임 대기 방 객체에 입장
 
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(9); // 스레드의 수에 맞게 CyclicBarrier 설정
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(10); // 스레드의 수에 맞게 CyclicBarrier 설정
 
         notify(playerId, cyclicBarrier); // 모든 서버에 플레이어 ID 값와 CyclicBarrier 객체 설정
 

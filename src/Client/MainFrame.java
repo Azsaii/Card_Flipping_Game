@@ -35,9 +35,9 @@ public class MainFrame extends JFrame {
     private JPanel mainPanel;
     private GameStartTimerPanel startPanel;
 
-    private JPanel mainScreenPanel;
+    private MainScreenPanel mainScreenPanel;
     private GameScreenPanel gameScreenPanel;
-    private JPanel roomScreenPanel;
+    private RoomScreenPanel roomScreenPanel;
 
     public MainFrame() throws IOException {
 
@@ -57,6 +57,7 @@ public class MainFrame extends JFrame {
 
         dataTranslatorWrapper.add(ServerName.CARD_UI_UPDATE_SERVER, new DataTranslator("localhost", 5010));
         dataTranslatorWrapper.add(ServerName.ITEM_UI_UPDATE_SERVER, new DataTranslator("localhost", 5011));
+        dataTranslatorWrapper.add(ServerName.GAME_CHAT_UI_UPDATE_SERVER, new DataTranslator("localhost", 5012));
 
         /* 메인 화면 구성 */
         cardLayout = new CardLayout();
@@ -110,7 +111,6 @@ public class MainFrame extends JFrame {
         
         // 서버로부터 화면 업데이트 메시지 받아 화면 전환하는 스레드
         Thread updateScreenThread = new Thread(() -> {
-            System.out.println("화면 전환 스레드 작동");
 
             DataTranslator dataTranslator = dataTranslatorWrapper.get(ServerName.SCREEN_UI_UPDATE_SERVER);
 

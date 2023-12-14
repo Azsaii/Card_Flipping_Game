@@ -29,7 +29,7 @@ public class GameScreenPanel extends JPanel {
     private ItemStorePanel itemStorePanel; // 아이템 상점 패널
     private CardPanel cardPanel; // 카드 패널 임시로 플레이어1로 설정.
     private GameTimerLimitPanel timeLimitPanel; // 타이머 패널
-    private GameChatPanel chatPanel = new GameChatPanel(); // 채팅 패널
+    private GameChatPanel chatPanel; // 채팅 패널
 
     // 패널 위치, 크기 정하고 붙이기
     public GameScreenPanel(long playerId){
@@ -51,8 +51,10 @@ public class GameScreenPanel extends JPanel {
         cardPanel = new CardPanel(scorePanel, playerId, playerType);
         itemStorePanel = new ItemStorePanel(scorePanel, cardPanel, playerType);
         timeLimitPanel = new GameTimerLimitPanel(scorePanel, cardPanel, playerType);
+        chatPanel = new GameChatPanel();
 
         cardPanel.startUpdateThread();
+        chatPanel.startGameChatThread();
 
         setPanelProperties(itemStorePanel, 0, 0, 350, 800);
         setPanelProperties(scorePanel, 350, 0, 800, 100);

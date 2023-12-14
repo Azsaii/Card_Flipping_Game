@@ -48,7 +48,7 @@ public class DataTranslator{
                 }
                 // 메타 데이터일 경우 무시하고 다음 데이터를 읽음
             } catch (IOException e) {
-                System.out.println("Input stream is closed or no data available.");
+                e.printStackTrace();
                 return null;  // 스트림이 닫힌 경우 null 반환
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);

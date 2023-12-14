@@ -33,7 +33,6 @@ public class MainChatPanel extends JPanel {
         textField = new JTextField(30);
         textArea.setEditable(false);
 
-
         ImageIcon imageIcon = new ImageIcon("images/send-icon.png");
 
         button = new JButton(imageIcon);

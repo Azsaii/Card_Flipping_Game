@@ -13,5 +13,6 @@ public enum ServerName {
 
     CARD_UI_UPDATE_SERVER, // 카드 UI 업데이트 서버
     ITEM_UI_UPDATE_SERVER, // 아이템 UI 업데이트 서버
+    GAME_CHAT_UI_UPDATE_SERVER, // 게임 채팅 UI 업데이트 서버
 }
 

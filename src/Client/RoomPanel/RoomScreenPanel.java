@@ -12,5 +12,4 @@ public class RoomScreenPanel extends JPanel {
         add(new RoomPlayerListPanel());
         add(new RoomBottomPanel(playerId));
     }
-
 }

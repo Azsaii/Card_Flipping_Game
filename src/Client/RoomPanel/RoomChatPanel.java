@@ -15,6 +15,9 @@ public class RoomChatPanel extends JPanel {
     JTextArea textArea;
     JTextField textField;
     JButton button;
+
+    Thread roomChatThread;
+
     RoomChatPanel() {
 
         setLayout(new GridBagLayout());
@@ -30,7 +33,7 @@ public class RoomChatPanel extends JPanel {
         textField = new JTextField(30);
         textArea.setEditable(false);
 
-        ImageIcon imageIcon = new ImageIcon("images/send-icon.png");
+        ImageIcon imageIcon = new ImageIcon("/images/send-icon.png");
 
         button = new JButton(imageIcon);
 
@@ -60,13 +63,13 @@ public class RoomChatPanel extends JPanel {
         textField.addActionListener(new RoomSendChatAction());
 
         //방 채팅 문자를 받는 스레드
-        Thread RoomChatThread = new Thread(() -> {
+        roomChatThread = new Thread(() -> {
             System.out.println("방 채팅 업데이트 스레드 작동");
             DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ROOM_CHAT_UI_UPDATE_SERVER);
 
             while (true) {
                 Map<String, Object> response = dataTranslator.receiveData();
-                if(response == null) break;
+
                 String command = (String) response.get("command");
 
                 if (command.equals("방 채팅 업데이트")) {
@@ -80,9 +83,10 @@ public class RoomChatPanel extends JPanel {
             }
         });
 
-        RoomChatThread.start();
+        roomChatThread.start();
     }
 
+    public void stopRoomChatThread(){roomChatThread.stop();}
 
     class RoomSendChatAction implements ActionListener
     {

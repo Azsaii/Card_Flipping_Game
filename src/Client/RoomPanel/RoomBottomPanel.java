@@ -8,7 +8,8 @@ public class RoomBottomPanel extends JPanel {
     RoomBottomPanel(long playerId) {
 
         setLayout(new GridLayout(1, 2, 10, 0));
-        add(new RoomChatPanel());
-        add(new RoomControlPanel(playerId));
+        RoomChatPanel roomChatPanel = new RoomChatPanel();
+        add(roomChatPanel);
+        add(new RoomControlPanel(playerId, roomChatPanel));
     }
 }

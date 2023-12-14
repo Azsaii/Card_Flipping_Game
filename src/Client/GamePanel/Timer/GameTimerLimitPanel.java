@@ -73,11 +73,8 @@ public class GameTimerLimitPanel extends JPanel {
                     // 게임 종료 처리
                     if (choice == 0 || choice == -1) { // 다이얼로그의 나가기 버튼을 눌렀거나 x 를 눌렀을 때
                         // 서버로 종료처리 메시지 전송
-                        Map<String, Object> request = new HashMap<>();
-                        request.put("command", "방 나가기");
-                        request.put("playerId", MainFrame.playerId);
-                        request.put("roomId", MainFrame.roomId);
-                        MainFrame.dataTranslatorWrapper.broadcast(request);
+                        sendGameExit("game_exit");
+                        sendGameExit("방 나가기");
 
                         MainFrame.roomId = 0; //현재 플레이어의 roomId를 0으로 초기화
                         timeLeft = 60; // 타이머 시간 초기화
@@ -92,6 +89,14 @@ public class GameTimerLimitPanel extends JPanel {
     // 남은 시간을 표시하는 레이블을 업데이트하는 메서드입니다.
     private void updateTimerLabel() {
         timeLimitLabel.setText(String.format("%02d:%02d", timeLeft / 60, timeLeft % 60));
+    }
+
+    private void sendGameExit(String command){
+        Map<String, Object> request = new HashMap<>();
+        request.put("command", command);
+        request.put("playerId", MainFrame.playerId);
+        request.put("roomId", MainFrame.roomId);
+        MainFrame.dataTranslatorWrapper.broadcast(request);
     }
 }
 
