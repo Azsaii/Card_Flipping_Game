@@ -18,6 +18,7 @@ public class ItemDescriptionPanel extends JPanel {
     public ItemDescriptionPanel(){
 
         setLayout(new BorderLayout());
+        setOpaque(false);
 
         nameLabel = new JLabel("", SwingConstants.CENTER);
         descriptionArea = new JTextArea();
@@ -25,6 +26,9 @@ public class ItemDescriptionPanel extends JPanel {
         descriptionArea.setLineWrap(true); // 자동 줄바꿈 활성화
         descriptionArea.setWrapStyleWord(true); // 단어 단위로 줄바꿈
         descriptionArea.setFont(new Font("", Font.PLAIN, 15)); // 글꼴 설정
+        descriptionArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0)); // 왼쪽에 10픽셀 마진
+        descriptionArea.setOpaque(false);
+
         add(nameLabel, BorderLayout.NORTH);
         add(descriptionArea, BorderLayout.CENTER);
 
@@ -34,7 +38,7 @@ public class ItemDescriptionPanel extends JPanel {
     public void setItemDescription(String name, String description) {
         nameLabel.setText(name);
         labelFont = nameLabel.getFont();
-        nameLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, 20)); // 글꼴 크기를 20으로 설정
+        nameLabel.setFont(new Font(labelFont.getName(), Font.BOLD, 20)); // 글꼴 크기를 20으로 설정
         descriptionArea.setText(description);
     }
 

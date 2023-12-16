@@ -2,6 +2,9 @@ package Client.GamePanel.Card;
 
 import javax.swing.*;
 
+/**
+ * 카드의 JLabel 에 부가정보를 더하기 위한 클래스
+ */
 public class CardLabel extends JLabel {
     private int colorState;
 

@@ -22,6 +22,7 @@ public class GameStartTimerPanel extends JPanel {
 
     public GameStartTimerPanel() {
         setLayout(new BorderLayout());
+        setOpaque(false);
 
         timerLabel = new JLabel("", SwingConstants.CENTER);
         Font labelFont = timerLabel.getFont();

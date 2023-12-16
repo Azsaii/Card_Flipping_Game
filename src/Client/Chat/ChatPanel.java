@@ -65,25 +65,5 @@ public abstract class ChatPanel extends JPanel {
         gbc.insets = new Insets(10, 0, 0, 0); // 상단에 10픽셀의 여백 추가
         add(chatBottomPanel, gbc);
     }
-
-    class RoundBorder implements Border {
-        private int radius;
-
-        RoundBorder(int radius) {
-            this.radius = radius;
-        }
-
-        public Insets getBorderInsets(Component c) {
-            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
-        }
-
-        public boolean isBorderOpaque() {
-            return true;
-        }
-
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            g.drawRoundRect(x, y, width-1, height-1, radius, radius);
-        }
-    }
 }
 

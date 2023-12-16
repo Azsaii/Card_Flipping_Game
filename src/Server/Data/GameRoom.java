@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 찬형 코드 옮길 때 id -> roomId로 변경 필요함
+ * 게임 방 클래스
+ * 한 방에 있는 두 플레이어 정보 저장
  */
 public class GameRoom implements Serializable {
 

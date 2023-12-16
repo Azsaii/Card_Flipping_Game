@@ -57,6 +57,7 @@ public class CardPanel extends JPanel {
         Arrays.fill(isBlind, false); // 검은 안개 효과 배열 초기화
 
         setLayout(new GridBagLayout());
+        setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
 
         // 패널의 하단에 여백 추가

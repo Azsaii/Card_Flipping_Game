@@ -27,9 +27,8 @@ public class ItemInUsePanel extends JPanel {
 
     public ItemInUsePanel(){
 
-        // int vGap = (int)((getParent().getHeight() - (2 * itemPanel1.getHeight())) / 2.0);
         setLayout(new FlowLayout(FlowLayout.CENTER, 30, 15));
-        setBackground(Color.white);
+        setOpaque(false);
 
         coolTimeLabel1 = new JLabel();
         coolTimeLabel2 = new JLabel();
@@ -45,15 +44,17 @@ public class ItemInUsePanel extends JPanel {
 
     private void addItemPanel(JPanel panel){
         panel.setLayout(new BorderLayout());
-        panel.setBackground(Color.white);
+        panel.setOpaque(false);
         add(panel);
     }
 
     // 아이템 쿨타임 레이블 추가하는 함수
-    private void addItemTimerLable(JPanel panel, JLabel label, String coolTime){
+    private void addItemTimerLable(JPanel panel, JLabel label, String coolTime, boolean isDuration){
         label.setText(coolTime);
         Font labelFont = label.getFont();
         label.setFont(new Font(labelFont.getName(), Font.PLAIN, 20)); // 글꼴 크기를 20으로 설정
+        if(isDuration) label.setForeground(Color.red); // 지속시간인 경우 빨간색으로 표시
+        else label.setForeground(Color.black);
         panel.add(label, BorderLayout.NORTH);
     }
 
@@ -68,22 +69,22 @@ public class ItemInUsePanel extends JPanel {
         panel.add(imageLabel, BorderLayout.CENTER);
     }
 
-    private void attachInUseItemPanel(JPanel panel, JLabel label, ItemData item){
-        addItemTimerLable(panel, label, String.valueOf(item.getCoolTime()));
+    private void attachInUseItemPanel(JPanel panel, JLabel label, ItemData item, String time, boolean isDuration){
+        addItemTimerLable(panel, label, time, isDuration);
         addItemImageLable(panel, item.getItemPath());
         usingPanels.put(item.getItemId(), panel);
     }
 
     // 사용 아이템을 패널에 추가하는 메서드
-    public void attachInUseItem(ItemData inUseItemData) {
+    public void attachInUseItem(ItemData inUseItemData, String time, boolean isDuration) {
 
         if(inUseItem1 == null){
             inUseItem1 = inUseItemData;
-            attachInUseItemPanel(itemPanel1, coolTimeLabel1, inUseItem1);
+            attachInUseItemPanel(itemPanel1, coolTimeLabel1, inUseItem1, time, isDuration);
 
         } else if(inUseItem2 == null){
             inUseItem2 = inUseItemData;
-            attachInUseItemPanel(itemPanel2, coolTimeLabel2, inUseItem2);
+            attachInUseItemPanel(itemPanel2, coolTimeLabel2, inUseItem2, time, isDuration);
         }
         revalidate();
         repaint();
@@ -109,10 +110,10 @@ public class ItemInUsePanel extends JPanel {
     public void updateCoolTime(int itemId){
 
         if(inUseItem1 != null && itemId == inUseItem1.getItemId()){
-            Double coolTime = Double.valueOf(coolTimeLabel1.getText());
+            int coolTime = Integer.valueOf(coolTimeLabel1.getText());
             coolTimeLabel1.setText(String.valueOf(coolTime - 1));
         } else if(inUseItem2 != null && itemId == inUseItem2.getItemId()){
-            Double coolTime = Double.valueOf(coolTimeLabel2.getText());
+            int coolTime = Integer.valueOf(coolTimeLabel2.getText());
             coolTimeLabel2.setText(String.valueOf(coolTime - 1));
         }
 

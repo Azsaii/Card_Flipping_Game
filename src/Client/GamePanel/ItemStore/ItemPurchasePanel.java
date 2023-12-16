@@ -36,13 +36,22 @@ public class ItemPurchasePanel extends JPanel {
 
     private static final String pathDefault = "images/items/";
 
+    private static final String[] itemDescriptoin = new String[]{
+            "모든 카드를 랜덤 색으로 재배치한다.\n나의 색으로 뒤집힌만큼 스코어를 빼앗는다.\n쿨타임: 6초",
+            "상대가 랜덤한 절반의 카드 색 변화를 못 보게 한다.\n지속시간: 7초, 쿨타임: 10초",
+            "모든 카드를 나의 색으로 뒤집는다.\n쿨타임: 8초",
+            "모든 방법으로 얻는 스코어 2배.\n지속시간: 7초, 쿨타임: 10초",
+            "클릭한 카드의 주변 상하좌우 카드를 같이 뒤집는다.\n지속시간: 7초, 쿨타임: 10초",
+            "모든 카드와 아이템 상호작용 불가.\n지속시간: 7초, 쿨타임: 10초",
+    };
+
     // 아이템 데이터
-    public static final ItemData RANDOM_FLIP = new ItemData(1, "랜덤 뒤집개", pathDefault + "RANDOM_FLIP.PNG", pathDefault + "RANDOM_FLIP_DE.PNG", 60, "모든 카드를 랜덤 색으로 재배치합니다.\n상대의 카드가 뒤집힌 수만큼 스코어를 빼앗습니다.", 6.0);
-    public static final ItemData BLACK_FOG = new ItemData(2, "검은 안개", pathDefault + "BLACK_FOG.PNG", pathDefault + "BLACK_FOG_DE.PNG", 50, "10초 동안상대가 랜덤한 절반의 카드 색을 보지 못하게 합니다.", 10.0);
-    public static final ItemData GOLD_FLIP = new ItemData(3, "황금 뒤집개", pathDefault + "GOLD_FLIP.PNG", pathDefault + "GOLD_FLIP_DE.PNG", 70, "모든 카드를 플레이어의 색으로 뒤집습니다.", 7.0);
-    public static final ItemData DOUBLE_EVENT = new ItemData(4, "더블 이벤트", pathDefault + "DOUBLE_EVENT.PNG", pathDefault + "DOUBLE_EVENT_DE.PNG", 100, "10초 동안 모든 방법으로 얻는 스코어 2배가 됩니다.", 10.0);
-    public static final ItemData CROSS = new ItemData(5, "크로스", pathDefault + "CROSS.PNG", pathDefault + "CROSS_DE.PNG", 100, "10초 동안 클릭한 카드의 주변 상하좌우 카드가 같이 뒤집어집니다.", 10.0);
-    public static final ItemData ICE_AGE = new ItemData(6, "얼음", pathDefault + "ICE_AGE.PNG", pathDefault + "ICE_AGE_DE.PNG", 70, "7초 동안 모든 카드가 뒤집을 수 없는 상태로 변합니다.", 7.0);
+    public static final ItemData RANDOM_FLIP = new ItemData(1, "랜덤 뒤집개", pathDefault + "RANDOM_FLIP.PNG", pathDefault + "RANDOM_FLIP_DE.PNG", 60, itemDescriptoin[0], 0, 6);
+    public static final ItemData BLACK_FOG = new ItemData(2, "검은 안개", pathDefault + "BLACK_FOG.PNG", pathDefault + "BLACK_FOG_DE.PNG", 50, itemDescriptoin[1], 7, 10);
+    public static final ItemData GOLD_FLIP = new ItemData(3, "황금 뒤집개", pathDefault + "GOLD_FLIP.PNG", pathDefault + "GOLD_FLIP_DE.PNG", 70, itemDescriptoin[2], 0, 8);
+    public static final ItemData DOUBLE_EVENT = new ItemData(4, "더블 이벤트", pathDefault + "DOUBLE_EVENT.PNG", pathDefault + "DOUBLE_EVENT_DE.PNG", 100, itemDescriptoin[3], 7, 10);
+    public static final ItemData CROSS = new ItemData(5, "크로스", pathDefault + "CROSS.PNG", pathDefault + "CROSS_DE.PNG", 100, itemDescriptoin[4], 7, 10);
+    public static final ItemData ICE_AGE = new ItemData(6, "얼음", pathDefault + "ICE_AGE.PNG", pathDefault + "ICE_AGE_DE.PNG", 70, itemDescriptoin[5], 7, 10);
     private ItemData[] itemDatas = new ItemData[ITEM_COUNT];
     private ItemLabel[] itemLabels = new ItemLabel[ITEM_COUNT];
 
@@ -65,6 +74,7 @@ public class ItemPurchasePanel extends JPanel {
 
         setItemDatas(); // 아이템 데이터를 배열에 세팅
         setLayout(new GridLayout(2, 3)); // 2행 3열의 그리드 레이아웃
+        setOpaque(false);
 
         // 아이템 패널 생성 및 추가
         for (int i = 0; i < ITEM_COUNT; i++) {
@@ -134,18 +144,24 @@ public class ItemPurchasePanel extends JPanel {
 
                 final ItemLabel[] source = {(ItemLabel) e.getSource()}; // 클릭된 레이블. 타이머 내부에서 사용하기 위해 final 선언됨
                 int itemId = source[0].getItemId(); // 아이템 id
-                double delay = itemDatas[i].getCoolTime(); // 쿨타임
+                int coolTime = itemDatas[i].getCoolTime(); // 쿨타임
+                int duration = itemDatas[i].getDuration(); // 쿨타임
                 String command = itemDatas[i].getItemPath().split("/")[2].split("\\.")[0]; // 커맨드 알아내기
 
                 // 아이템 사용 패널에 클릭한 아이템 추가되도록 업데이트
                 inUseItemDataCount++;
-                inUsePanel.attachInUseItem(itemDatas[i]);
+                if(itemDatas[i].getDuration() == 0) { // 비지속형 아이템
+                    inUsePanel.attachInUseItem(itemDatas[i], String.valueOf(itemDatas[i].getCoolTime()), false);
+                } else {
+                    inUsePanel.attachInUseItem(itemDatas[i], String.valueOf(itemDatas[i].getDuration()), true);
+                }
+
 
                 // 아이템 사용을 서버에 알림
                 sendItemUseNotice(command);
 
                 // 클릭된 아이템 비활성화
-                deActiveItemPanel(i, source, delay, itemId); // 클릭된 아이템 비활성화, 쿨타임 처리
+                deActiveItemPanel(i, source, duration, coolTime, itemId); // 클릭된 아이템 비활성화, 쿨타임 처리
             }
         });
 
@@ -162,19 +178,19 @@ public class ItemPurchasePanel extends JPanel {
     private void setIiemPurchaseLable(JPanel itemPanel, String text, String pos){
         JLabel itemLabel = new JLabel(text, SwingConstants.CENTER);
         Font labelFont = itemLabel.getFont();
-        itemLabel.setFont(new Font(labelFont.getName(), Font.PLAIN, 20)); // 글꼴 크기를 20으로 설정
+        itemLabel.setFont(new Font(labelFont.getName(), Font.BOLD, 20)); // 글꼴 크기를 20으로 설정
         itemPanel.add(itemLabel, pos);
     }
 
     // 아이탬 패널 비활성화
-    private void deActiveItemPanel(int i, ItemLabel[] source, double delay, int itemId){
+    // 비지속형 아이템: 바로 쿨타임 시작
+    // 지속형 아이템: 아이템 효과 지속시간(duation)이 종료된 후 쿨타임 시작
+    private void deActiveItemPanel(int i, ItemLabel[] source, int duration, int coolTime, int itemId){
         itemActivated[i] = false;
         setImage(source[0], i, itemDatas[i].getItemDeactivePath()); // 비활성화 이미지 설정
 
-        // 지정된 시간 후에 아이템 패널을 다시 활성화
-        Timer timer = new Timer(1000, null);
-        timer.addActionListener(new ActionListener() {
-            double remainingDelay = delay;
+        ActionListener actionListener = new ActionListener() {
+            int remainingDelay = coolTime;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -190,12 +206,44 @@ public class ItemPurchasePanel extends JPanel {
                     }
                     inUseItemDataCount--; // 아이템 사용 수 감소
                     inUsePanel.detachInUseItem(itemId); // 아이템 사용 패널에서 제거
-                    timer.stop();
+                    ((Timer)e.getSource()).stop();
                 }
             }
-        });
-        timer.start();
+        };
+
+        if (duration == 0) { // 비지속형 아이템이면 바로 쿨타임 시작
+            Timer timer = new Timer(1000, actionListener);
+            timer.start();
+        } else { // 지속형 아이템은 지속시간이 끝난 후 쿨타임 시작
+            Timer delayTimer = new Timer(duration * 1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // 지속시간 제거, 쿨타임 시작
+                    inUsePanel.detachInUseItem(itemId);
+                    inUsePanel.attachInUseItem(itemDatas[i], String.valueOf(itemDatas[i].getCoolTime()), false);
+
+                    Timer timer = new Timer(1000, actionListener);
+                    timer.start();
+                    ((Timer)e.getSource()).stop();
+                }
+            });
+            Timer updateCoolTimeTimer = new Timer(1000, new ActionListener() {
+                int remainingDelay = duration;
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    remainingDelay--;
+                    inUsePanel.updateCoolTime(itemId); // 지속시간 레이블 표시 1초씩 감소
+                    if (remainingDelay <= 0) {
+                        ((Timer)e.getSource()).stop();
+                    }
+                }
+            });
+            delayTimer.setRepeats(false);
+            delayTimer.start();
+            updateCoolTimeTimer.start();
+        }
     }
+
 
     // 아이템 사용 시 서버에 아이템 사용 알림
     public void sendItemUseNotice(String command){

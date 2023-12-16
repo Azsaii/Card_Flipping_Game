@@ -22,10 +22,15 @@ public class ScorePanel extends JPanel {
 
         setLayout(new GridLayout(0,3));
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        setOpaque(false);
 
         JPanel p1 = new JPanel(new GridBagLayout());
         JPanel p2 = new JPanel(new GridBagLayout());
         JPanel p3 = new JPanel(new GridBagLayout());
+
+        p1.setOpaque(false);
+        p2.setOpaque(false);
+        p3.setOpaque(false);
 
         score1 = new JLabel("0");
         score2 = new JLabel("0");

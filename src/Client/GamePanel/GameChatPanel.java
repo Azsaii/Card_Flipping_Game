@@ -1,9 +1,9 @@
 package Client.GamePanel;
 
+import Client.Chat.ChatPanel;
 import Client.Chat.ChatThread;
 import Client.Chat.RoomSendChatAction;
-import Client.MainFrame;
-import Network.DataTranslator;
+import Client.Chat.RoundBorder;
 import Network.ServerName;
 
 import javax.swing.*;
@@ -11,6 +11,7 @@ import java.awt.*;
 
 public class GameChatPanel extends JPanel {
 
+    private JLabel gameTitle;
     private JTextPane textPane;  // JTextArea 대신 JTextPane 사용
     private JTextField textField;
     private JScrollPane scrollPane;
@@ -22,25 +23,29 @@ public class GameChatPanel extends JPanel {
         setLayout(null);  // 배치 관리자 제거
         setOpaque(false);
 
-        textPane = new JTextPane();  // JTextPane 생성
-        scrollPane = new JScrollPane(textPane);
-        scrollPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 5, 0), // 컴포넌트에 여백 추가
-                BorderFactory.createLineBorder(Color.BLACK) // 테두리 추가
-        ));
+        gameTitle = new JLabel("Chatting");
+        Font gameTitleFont = gameTitle.getFont();
 
+        gameTitle.setFont(gameTitleFont.deriveFont(Font.BOLD, 30));
+        gameTitle.setHorizontalAlignment(JLabel.CENTER);
+        add(gameTitle);
+
+        textPane = new JTextPane();
         textField = new JTextField();
-        textField.setMargin(new Insets(5, 5, 5, 5));  // 텍스트 필드의 내부 여백 설정
-        textField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5, 0, 5, 0), // 컴포넌트에 여백 추가
-                BorderFactory.createLineBorder(Color.BLACK) // 테두리 추가
-        ));
+
+        textPane.setMargin(new Insets(5, 5, 5, 5));
+        scrollPane = new JScrollPane(textPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setOpaque(false);
 
         // 폰트 설정
         Font font = new Font("돋움", Font.PLAIN, 15);
         textPane.setFont(font);
         textField.setFont(font);
-        textPane.setMargin(new Insets(5, 5, 5, 5));
+
+        // 둥근 테두리 설정
+        textPane.setBorder(new RoundBorder(5));
+        textField.setBorder(new RoundBorder(5));
 
         add(scrollPane);
         add(textField);
@@ -62,11 +67,13 @@ public class GameChatPanel extends JPanel {
         int margin = 5;  // 마진 설정
         int gap = 5;  // 컴포넌트 사이의 간격 설정
         int width = 325;
-        int height1 = 700;
-        int height2 = 50;
+        int height0 = 50;
+        int height1 = 650;
+        int height2 = 45;
 
-        scrollPane.setBounds(margin, margin, width, height1);
-        textField.setBounds(margin, height1 + margin + gap, width, height2);
+        gameTitle.setBounds(margin, margin, width, height0);
+        scrollPane.setBounds(margin, margin + height0, width, height1);
+        textField.setBounds(margin, height0 + height1 + margin + gap, width, height2);
     }
 
     public void startGameChatThread(){chatThread.start();} // 게임 채팅 스레드 작동

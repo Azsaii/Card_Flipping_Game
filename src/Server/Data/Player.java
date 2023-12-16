@@ -10,7 +10,9 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.net.Socket;
 
-// 원본에서 socket -> roomSocket / getSocket -> getRoomSocket으로 변경
+/**
+ * 플레이어 모델 클래스
+ */
 public class Player implements Serializable {
     private long id;
     private String name;

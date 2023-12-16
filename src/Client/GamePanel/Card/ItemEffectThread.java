@@ -16,8 +16,6 @@ import java.awt.event.ActionListener;
 import java.util.Map;
 
 import static Client.GamePanel.Card.CardPanel.*;
-import static Client.GamePanel.GameScreenPanel.PLAYER1;
-import static Client.GamePanel.GameScreenPanel.PLAYER2;
 import static Client.GamePanel.ItemStore.ItemPurchasePanel.*;
 
 /**
@@ -71,7 +69,7 @@ public class ItemEffectThread extends Thread{
                     if(senderId == playerId) break; // 자신이 사용한 경우 영향 없음
 
                     cardPanel.activateBlackFog();
-                    int delay = BLACK_FOG.getCoolTime().intValue();
+                    int delay = BLACK_FOG.getDuration();
                     new Timer(delay * 1000, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -94,7 +92,7 @@ public class ItemEffectThread extends Thread{
                 case COMMAND_DOUBLE_EVENT: {
                     int targetPlayer = (senderId == playerId) ? playerType : 1-playerType;
                     scorePanel.setStrategy(DoubleScoreStrategy.getInstance(), targetPlayer);
-                    int delay = DOUBLE_EVENT.getCoolTime().intValue();
+                    int delay = DOUBLE_EVENT.getDuration();
                     price = (int)Math.round(DOUBLE_EVENT.getItemPrice() * -0.1);
                     new Timer(delay * 1000, new ActionListener() {
                         @Override
@@ -112,7 +110,7 @@ public class ItemEffectThread extends Thread{
                     if(senderId != playerId) break; // 상대가 사용한 경우 영향 없음
 
                     cardPanel.isCrossMode = true; // 크로스 모드 시작
-                    int delay = CROSS.getCoolTime().intValue();
+                    int delay = CROSS.getDuration();
                     new Timer(delay * 1000, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -126,8 +124,8 @@ public class ItemEffectThread extends Thread{
                 // 아이스 에이지
                 case COMMAND_ICE_AGE: {
                     cardPanel.activeCardIceAge();
-                    itemPurchasePanel.deActiveItemPanel(ICE_AGE.getCoolTime()); // 모든 아이템 구입 불가 처리
-                    int delay = ICE_AGE.getCoolTime().intValue();
+                    itemPurchasePanel.deActiveItemPanel(ICE_AGE.getDuration()); // 모든 아이템 구입 불가 처리
+                    int delay = ICE_AGE.getDuration();
                     price = (int)Math.round(ICE_AGE.getItemPrice() * -0.1);
 
                     new Timer(delay * 1000, new ActionListener() {

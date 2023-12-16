@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CyclicBarrier;
 
+/**
+ * ServerTemplate 을 상속하는 서버들을 실행시키는 서버 클래스
+ */
 public  class GameDataInitialServer extends ServerTemplate {
 
     private List<ServerTemplate> serverTemplates = new ArrayList<>(); //나머지 서버을 담기 위한 ArrayList

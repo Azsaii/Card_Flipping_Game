@@ -2,7 +2,6 @@ package Server.UI;
 
 import Network.DataTranslator;
 import Network.ServerName;
-import Server.ChatServerThreadTemplate;
 import Server.Data.Player;
 import Server.Manager.GameWaitingRoomManager;
 import Server.Manager.PlayerManager;

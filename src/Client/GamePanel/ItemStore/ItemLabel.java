@@ -2,6 +2,9 @@ package Client.GamePanel.ItemStore;
 
 import javax.swing.*;
 
+/**
+ * 아이템의 JLabel 에 부가정보를 더하기 위한 클래스
+ */
 public class ItemLabel extends JLabel {
     private int itemId;
 

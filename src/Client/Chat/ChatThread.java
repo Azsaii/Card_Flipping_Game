@@ -9,10 +9,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import java.util.Map;
-import java.util.PrimitiveIterator;
 
 /**
  * 서버로부터 메시지를 받아 채팅 패널에 내역을 추가하는 스레드

@@ -17,7 +17,7 @@ public class ItemStorePanel extends JPanel {
     static final int ITEM_COUNT = 6;
 
     // 패널 생성
-    private ItemStoreImagePanel storeImagePanel = new ItemStoreImagePanel();
+    private ItemStoreTitlePanel storeImagePanel = new ItemStoreTitlePanel();
     private ItemDescriptionPanel descriptionPanel = new ItemDescriptionPanel();
     private ItemInUsePanel inUsePanel = new ItemInUsePanel();
     private ItemPurchasePanel purchasePanel;
@@ -32,11 +32,12 @@ public class ItemStorePanel extends JPanel {
 
         // BoxLayout 생성하고, 이를 수직으로 설정
         setLayout(null);
+        setOpaque(false);
 
         // 패널 붙이기
         setPanelProperties(storeImagePanel, 0,100);
-        setPanelProperties(descriptionPanel, 100,100);
-        setPanelProperties(purchasePanel, 200,400);
+        setPanelProperties(descriptionPanel, 100,110);
+        setPanelProperties(purchasePanel, 210,390);
         setPanelProperties(inUsePanel, 600, 161);
 
         SwingUtilities.invokeLater(new Runnable() {
