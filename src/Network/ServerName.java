@@ -8,7 +8,7 @@ public enum ServerName {
     ROOM_LIST_UI_UPDATE_SERVER, //방 목록을 업데이트하기 위한 서버
     PLAYER_STATUS_UI_UPDATE_SERVER, //게임 방의 플레이어 상태를 업데이트하기 위한 서버
     ROOM_CHAT_UI_UPDATE_SERVER, //게임 방 채팅을 업데이트 하기 위한 서버
-    CHAT_UI_UPDATE_SERVER, //전체 채팅을 업데이트 하기 위한 서버
+    ALL_CHAT_UI_UPDATE_SERVER, //전체 채팅을 업데이트 하기 위한 서버
     ROOM_CONTROL_UI_UPDATE_SERVER, //방 컨트롤 UI를 업데이트 하기 위한 서버
 
     CARD_UI_UPDATE_SERVER, // 카드 UI 업데이트 서버

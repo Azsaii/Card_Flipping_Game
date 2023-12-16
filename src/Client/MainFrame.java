@@ -51,7 +51,7 @@ public class MainFrame extends JFrame {
         dataTranslatorWrapper.add(ServerName.ROOM_LIST_UI_UPDATE_SERVER, new DataTranslator("localhost", 5003));
         dataTranslatorWrapper.add(ServerName.PLAYER_STATUS_UI_UPDATE_SERVER, new DataTranslator("localhost", 5004));
         dataTranslatorWrapper.add(ServerName.ROOM_CHAT_UI_UPDATE_SERVER, new DataTranslator("localhost", 5005));
-        dataTranslatorWrapper.add(ServerName.CHAT_UI_UPDATE_SERVER, new DataTranslator("localhost", 5006));
+        dataTranslatorWrapper.add(ServerName.ALL_CHAT_UI_UPDATE_SERVER, new DataTranslator("localhost", 5006));
         dataTranslatorWrapper.add(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER, new DataTranslator("localhost", 5007));
 
         dataTranslatorWrapper.add(ServerName.CARD_UI_UPDATE_SERVER, new DataTranslator("localhost", 5010));

@@ -1,7 +1,7 @@
 package Client.GamePanel;
 
 import Client.Chat.ChatThread;
-import Client.Chat.RoomSendChatAction;
+import Client.Chat.ChatSendAction;
 import Client.Chat.RoundBorder;
 import Network.ServerName;
 
@@ -19,7 +19,7 @@ public class GameChatPanel extends JPanel {
     private JScrollPane scrollPane;
     private ChatThread chatThread;
 
-    public RoomSendChatAction roomSendChatAction;
+    public ChatSendAction chatSendAction;
     public GameChatPanel(){
 
         setLayout(null);  // 배치 관리자 제거
@@ -53,9 +53,9 @@ public class GameChatPanel extends JPanel {
         add(textField);
 
         // 메시지 전송 이벤트 클래스
-        roomSendChatAction = new RoomSendChatAction(textField);
-        roomSendChatAction.setCommand("game_chat");
-        textField.addActionListener(roomSendChatAction);
+        chatSendAction = new ChatSendAction(textField);
+        chatSendAction.setCommand("game_chat");
+        textField.addActionListener(chatSendAction);
 
         //방 채팅 문자를 받는 스레드 생성
         chatThread = new ChatThread("game_chat", ServerName.GAME_CHAT_UI_UPDATE_SERVER, textPane);

@@ -11,8 +11,8 @@ import java.util.concurrent.CyclicBarrier;
  * 플레이어와 연결하는 기능하는 서버 템플릿
  */
 public abstract class ServerTemplate implements Runnable {
-    private int port;
 
+    private int port;
     protected long playerId;   // 각 서버에서 연결된 플레이어의 Id 값
     protected CyclicBarrier cyclicBarrier;
     protected DataTranslator dataTranslator;

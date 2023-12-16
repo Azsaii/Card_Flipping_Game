@@ -251,7 +251,7 @@ public class MainRoomListPanel extends JPanel {
             if (result.equals("OK")) { //게임 방 입장이 성공적으로 되었다면
                 MainFrame.setRoomid(roomId); // 메인 프레임의 roomId 세팅
             } else if (result.equals("FAIL")) {
-                JOptionPane.showMessageDialog(this, "해당 방의 인원이 꽉 차여져 있어 입장할 수 없습니다!", "방 입장", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "해당 방이 가득 차서 입장할 수 없습니다!", "방 입장", JOptionPane.WARNING_MESSAGE);
             }
         }
 

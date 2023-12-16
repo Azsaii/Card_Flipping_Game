@@ -1,16 +1,14 @@
 package Network;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-//여러 DataTranslator 클래스를 다루기 위한 클래스
+/**
+ * 여러 DataTranslator 클래스를 다루기 위한 클래스
+ */
 public class DataTranslatorWrapper {
 
-
     private final Map<ServerName, DataTranslator> dataTranslators = new ConcurrentHashMap<>();
-
 
     public synchronized void add(ServerName serverName, DataTranslator dataTranslator) {
         dataTranslators.put(serverName, dataTranslator);

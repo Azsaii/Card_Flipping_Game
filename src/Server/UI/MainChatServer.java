@@ -26,9 +26,9 @@ public class MainChatServer extends ServerTemplate {
     protected void handleClient() {
         MainChatServerThreadTemplate mainChatServerThread = new MainChatServerThreadTemplate(dataTranslator, cyclicBarrier);
 
-        Player player = PlayerManager.getInstance().getPlayer(playerId); //플레이어 ID값으로 Player 객체를 찾음
-        player.addServer(ServerName.CHAT_UI_UPDATE_SERVER, dataTranslator); //찾은 Player 객체에 현재 서버에서 생성한 DataTranslator 객체를 추가함
-        mainChatServerThread.start(); //서버 스레드를 실행 함.
+        Player player = PlayerManager.getInstance().getPlayer(playerId); // 플레이어 ID 값으로 Player 객체를 찾음
+        player.addServer(ServerName.ALL_CHAT_UI_UPDATE_SERVER, dataTranslator); // 찾은 Player 객체에 현재 서버에서 생성한 DataTranslator 객체를 추가함
+        mainChatServerThread.start(); // 서버 스레드를 실행 함.
 
     }
 }
@@ -55,7 +55,7 @@ class MainChatServerThreadTemplate extends ServerThread {
             List<Player> players = gameWaitingRoomManager.getGameWaitingRoom().getPlayers();
 
             for (Player player : players) {
-                DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.CHAT_UI_UPDATE_SERVER);
+                DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ALL_CHAT_UI_UPDATE_SERVER);
                 playerDataTranslator.sendData(response);
             }
         }

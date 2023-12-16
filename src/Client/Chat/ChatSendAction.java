@@ -11,18 +11,18 @@ import java.util.Map;
 /**
  * 채팅 패널에서 텍스트 입력 후 엔터를 눌렀을 때 서버로 메시지 전송 이벤트 클래스
  */
-public class RoomSendChatAction implements ActionListener
+public class ChatSendAction implements ActionListener
 {
     private JButton button;
     private JTextField textField;
     private String command;
 
-    public RoomSendChatAction(JButton button, JTextField textField){
+    public ChatSendAction(JButton button, JTextField textField){
         this.button = button;
         this.textField = textField;
     }
 
-    public RoomSendChatAction(JTextField textField){
+    public ChatSendAction(JTextField textField){
         this.button = new JButton();
         this.textField = textField;
     }

@@ -44,7 +44,6 @@ public abstract class ServerThread extends Thread {
 
     public Map<String, Object> checkexit(){ // 클라이언트가 게임을 종료했는지 확인하는 메서드
         Map<String, Object> request = dataTranslator.receiveData();
-
         if(request == null) return null; // 클라이언트 측 소켓이 close된 경우 루프를 빠져나간다.
 
         String command = (String) request.get("command");

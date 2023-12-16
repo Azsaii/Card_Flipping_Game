@@ -79,6 +79,7 @@ public class ScorePanel extends JPanel {
         else score *= DefaultScoreStrategy.getInstance().getScore();
         
         int newScore = Integer.valueOf(targetLable.getText()) + score;
+        if(newScore < 0) newScore = 0;
         targetLable.setText(String.valueOf(newScore));
     }
 
