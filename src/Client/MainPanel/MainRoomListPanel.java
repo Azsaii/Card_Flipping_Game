@@ -19,7 +19,7 @@ import static Client.MainFrame.playerId;
 /**
  * 메인 화면에서 게임 방 리스트를 보이는 패널
  */
-public class RoomListPanel extends JPanel {
+public class MainRoomListPanel extends JPanel {
 
     private ReadOnlyTableModel  tableModel;
     private Image backgroundImage;
@@ -29,7 +29,7 @@ public class RoomListPanel extends JPanel {
         super.paintComponent(g);
         g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
     }
-    public RoomListPanel() {
+    public MainRoomListPanel() {
 
         try {
             backgroundImage = ImageIO.read(new File("images/background.png"));
@@ -129,7 +129,6 @@ public class RoomListPanel extends JPanel {
         add(scrollPane, gbc);
 
         Thread updateRoomListThread = new Thread(() -> {
-            System.out.println("방 리스트 업데이트 스레드 작동");
 
             Map<String, Object> request = new HashMap<>();
             request.put("command", "game_enter");
@@ -254,8 +253,6 @@ public class RoomListPanel extends JPanel {
             } else if (result.equals("FAIL")) {
                 JOptionPane.showMessageDialog(this, "해당 방의 인원이 꽉 차여져 있어 입장할 수 없습니다!", "방 입장", JOptionPane.WARNING_MESSAGE);
             }
-
-            System.out.println("MainFrame.rooId = " + MainFrame.roomId);
         }
 
 

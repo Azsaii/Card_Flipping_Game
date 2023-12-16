@@ -6,6 +6,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * 게임 방 패널을 붙이는 클래스
+ */
 public class RoomScreenPanel extends JPanel {
 
     private Image backgroundImage;

@@ -60,7 +60,6 @@ class ItemUIUpdateServerThread extends ServerThread {
 
             Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 
-            System.out.println("서버: 아이템 사용됨 - " + command);
             long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
             Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
             GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);

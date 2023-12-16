@@ -1,8 +1,9 @@
-package Client.GamePanel.Timer;
+package Client.GamePanel;
 
 import Client.GamePanel.Card.CardPanel;
 import Client.GamePanel.Score.ScorePanel;
 import Client.MainFrame;
+import Client.MusicManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,9 @@ import java.util.Map;
 import static Client.GamePanel.GameScreenPanel.PLAYER1;
 import static Client.GamePanel.GameScreenPanel.PLAYER2;
 
+/**
+ * 게임 내에서 타이머를 붙이고 작동시키는 클래스
+ */
 public class GameTimerLimitPanel extends JPanel {
     private JLabel timeLimitLabel; // 타이머를 표시할 레이블
     private int timeLeft = 180; // 남은 시간 (초)
@@ -60,8 +64,16 @@ public class GameTimerLimitPanel extends JPanel {
                     int otherScore = Integer.valueOf(scorePanel.getScore(1 - playerType));
                     String result;
 
-                    if(myScore == otherScore) result = "비겼습니다.";
-                    else result = (myScore > otherScore) ? "승리!!" : "패배했습니다.";
+                    // 승, 패, 비김 별로 텍스트 설정과 효과음 재생
+                    if(myScore > otherScore){
+                        result = "승리!!";
+                        MusicManager.getInstance().playSoundEffect("audio/game_win.wav");
+
+                    } else {
+                        result = (myScore == otherScore) ? "비겼습니다." : "패배했습니다.";
+                        MusicManager.getInstance().playSoundEffect("audio/game_lose.wav");
+                    }
+
                     result += "\n나의 스코어: " + myScore;
                     result += "\n상대 스코어: " + otherScore;
 

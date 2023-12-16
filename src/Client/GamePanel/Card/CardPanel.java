@@ -3,6 +3,7 @@ package Client.GamePanel.Card;
 import Client.GamePanel.ItemStore.ItemPurchasePanel;
 import Client.GamePanel.Score.ScorePanel;
 import Client.MainFrame;
+import Client.MusicManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,11 @@ import java.util.*;
 import static Client.GamePanel.GameScreenPanel.PLAYER1;
 import static Client.GamePanel.GameScreenPanel.PLAYER2;
 
+/**
+ * 카드 관련 전담 패널
+ * 카드 클릭 시 화면을 업데이트하고 상대방에게 뒤집은 카드 위치정보 전달
+ * 카드 클릭 시 스코어 업데이트 메시지 전송
+ */
 public class CardPanel extends JPanel {
 
     static final int RED_CARD = 3;
@@ -44,11 +50,6 @@ public class CardPanel extends JPanel {
     public boolean isCrossMode = false; // 크로스 모드. 기본적으로 false
     public boolean[] isBlind = new boolean[24]; // 검은 안개 효과 적용 여부. 기본적으로 false
 
-    /**
-     * 카드 관련 전담 패널
-     * 카드 클릭 시 화면을 업데이트하고 상대방에게 뒤집은 카드 위치정보 전달
-     * 카드 클릭 시 스코어 업데이트 메시지 전송
-     */
     public CardPanel(ScorePanel scorePanel, long playerId, int playerType) {
         this.scorePanel = scorePanel;
         this.playerId = playerId;
@@ -107,6 +108,7 @@ public class CardPanel extends JPanel {
 
                     // 플레이어1이고 레드 카드를 뒤집으면 스코어 업데이트하고 그린 카드로 변경
                     if (playerType == PLAYER1 && cardLabel.getColorState() == RED_CARD) {
+                        MusicManager.getInstance().playSoundEffect("audio/cardFlip.wav"); // 효과음 재생
                         if(!isBlind[finalI]) {
                             updateCardData(cardLabel, greenCardImg, GREEN_CARD); // 검은 안개 상태가 true이면 색 변경 안함
                         }
@@ -122,6 +124,7 @@ public class CardPanel extends JPanel {
 
                     // 플레이어2이고 그린 카드를 뒤집으면 스코어 업데이트하고 레드 카드로 변경
                     else if(playerType == PLAYER2 && cardLabel.getColorState() == GREEN_CARD) {
+                        MusicManager.getInstance().playSoundEffect("audio/cardFlip.wav"); // 효과음 재생
                         if(!isBlind[finalI]) updateCardData(cardLabel, redCardImg, RED_CARD);
                         else updateCardData(cardLabel, blackCardImg, RED_CARD);
 
@@ -184,7 +187,6 @@ public class CardPanel extends JPanel {
             int colorState = (cardArray[i]) ? RED_CARD : GREEN_CARD;
             if(!isBlind[i]) icon = (cardArray[i]) ? redCardImg : greenCardImg;
 
-            System.out.println("colorState: " + colorState + ", icon: " + icon + ", isblind[" + i + "]: " + isBlind[i]);
             updateCardData(cardLabels[y][x], icon, colorState);
         }
     }
@@ -284,7 +286,6 @@ public class CardPanel extends JPanel {
 
         // 섞인 리스트의 앞 12개 요소에 해당하는 isBlind 배열의 값을 true로 변경
         for (int i = 0; i < 12; i++) {
-            System.out.println("blind i: " + list.get(i));
             isBlind[list.get(i)] = true;
         }
 

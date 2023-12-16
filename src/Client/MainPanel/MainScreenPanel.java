@@ -13,7 +13,7 @@ public class MainScreenPanel extends JPanel {
 
         setLayout(new GridLayout(1, 2));
 
-        add(new RoomListPanel());
+        add(new MainRoomListPanel());
         add(new MainControlPanel());
     }
 }

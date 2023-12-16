@@ -1,6 +1,5 @@
 package Client.GamePanel;
 
-import Client.Chat.ChatPanel;
 import Client.Chat.ChatThread;
 import Client.Chat.RoomSendChatAction;
 import Client.Chat.RoundBorder;
@@ -9,6 +8,9 @@ import Network.ServerName;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * 게임 내 채팅 담당 클래스
+ */
 public class GameChatPanel extends JPanel {
 
     private JLabel gameTitle;

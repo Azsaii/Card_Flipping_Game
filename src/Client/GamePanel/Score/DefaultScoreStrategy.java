@@ -2,6 +2,9 @@ package Client.GamePanel.Score;
 
 import static Client.GamePanel.Score.ScorePanel.DEFAULT_SCORE_ADD;
 
+/**
+ * 기본 스코어를 리턴하는 클래스
+ */
 public class DefaultScoreStrategy implements ScoreStrategy {
 
     private static DefaultScoreStrategy instance;

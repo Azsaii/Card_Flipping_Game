@@ -1,6 +1,7 @@
 package Client.RoomPanel;
 
 import Client.MainFrame;
+import Client.MusicManager;
 import Network.DataTranslator;
 import Network.ServerName;
 import Server.Data.Player;
@@ -14,6 +15,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 나가기, 준비, 시작 버튼을 붙이는 클래스
+ */
 public class RoomControlPanel extends JPanel {
 
     JButton readyButton;
@@ -128,6 +132,7 @@ public class RoomControlPanel extends JPanel {
                 request.put("roomId", MainFrame.roomId);
 
                 MainFrame.dataTranslatorWrapper.broadcast(request);
+                MusicManager.getInstance().playSoundEffect("audio/game_start.wav");
             }
         });
 

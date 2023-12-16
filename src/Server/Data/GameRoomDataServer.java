@@ -83,12 +83,11 @@ class GameRoomDataServerThread extends ServerThread {
             Player currentPlayer = playerManager.getPlayer(playerId); //플레이어를 찾음.
 
             if(gameRoomManager.enter(roomId, currentPlayer)) { //현재 플레이어를 해당 ID 값을 가진 게임 방에 입장 시킴.
-                System.out.println("SERVER: ROOM ENTERED player: " + currentPlayer + ", roomId: " + roomId);
                 gameWaitingRoomManager.leave(currentPlayer); //만약 성공적으로 게임 방에 입장 했다면 현재 플레이어를 대기 방에서 나가게 함.
                 response.put("result", "OK");
                 dataTranslator.sendData(response);
             }else {
-                System.out.println("방이 꽉 찼습니다."); //인원 초과 시 출력
+                System.out.println("방이 가득 찼습니다."); //인원 초과 시 출력
                 response.put("result", "FAIL");
                 dataTranslator.sendData(response);
             }

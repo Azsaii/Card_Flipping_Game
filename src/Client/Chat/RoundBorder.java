@@ -3,6 +3,9 @@ package Client.Chat;
 import javax.swing.border.Border;
 import java.awt.*;
 
+/**
+ * 둥근 테두리 커스텀 클래스
+ */
 public class RoundBorder implements Border {
     private int radius;
 

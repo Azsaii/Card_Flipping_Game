@@ -7,6 +7,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CyclicBarrier;
 
+/**
+ * 플레이어와 연결하는 기능하는 서버 템플릿
+ */
 public abstract class ServerTemplate implements Runnable {
     private int port;
 

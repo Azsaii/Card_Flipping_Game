@@ -45,7 +45,6 @@ public class MainRoomButtonPanel extends JPanel  {
                 Map<String, Object> response = dataTranslator.receiveData();
 
                 MainFrame.roomId = (long) response.get("roomId");
-                System.out.println("MainFrame.rooId = " + MainFrame.roomId);
             }
         });
 

@@ -67,8 +67,16 @@ class GameChatServerThreadTemplate extends ServerThread {
 
             response.put("command", "game_exit");
             Player player = PlayerManager.getInstance().getPlayer(playerId);
-            DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.GAME_CHAT_UI_UPDATE_SERVER);
-            playerDataTranslator.sendData(response);
+
+            // 게임채팅, 카드업데이트, 아이템업데이트 스레드 종료를 위해 메시지 전송
+            sendExitResponse(player, ServerName.GAME_CHAT_UI_UPDATE_SERVER, response);
+            sendExitResponse(player, ServerName.CARD_UI_UPDATE_SERVER, response);
+            sendExitResponse(player, ServerName.ITEM_UI_UPDATE_SERVER, response);
         }
+    }
+
+    private void sendExitResponse(Player player, ServerName serverName, Map<String, Object> response){
+        DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(serverName);
+        playerDataTranslator.sendData(response);
     }
 }

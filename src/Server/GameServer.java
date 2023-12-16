@@ -6,6 +6,10 @@ import Server.UI.*;
 
 import java.util.concurrent.CyclicBarrier;
 
+/**
+ * 서버 시작용 클래스
+ * 실행 시 모든 서버가 시작됩니다.
+ */
 public class GameServer {
     public static void main(String[] args) {
 

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 방 채팅 클래스
+ * 방 채팅 담당 클래스
  */
 public class RoomChatPanel extends ChatPanel {
     public RoomSendChatAction roomSendChatAction; // 메시지 보내는 이벤트 클래스

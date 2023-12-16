@@ -3,12 +3,9 @@ package Client.GamePanel;
 import Client.GamePanel.Card.CardPanel;
 import Client.GamePanel.ItemStore.ItemStorePanel;
 import Client.GamePanel.Score.ScorePanel;
-import Client.GamePanel.Timer.GameTimerLimitPanel;
 import Client.MainFrame;
+import Client.MusicManager;
 import Server.Data.GameRoom;
-import Server.Data.Player;
-import Server.Manager.GameRoomManager;
-import Server.Manager.PlayerManager;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

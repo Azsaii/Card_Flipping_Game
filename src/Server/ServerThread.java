@@ -61,7 +61,6 @@ public abstract class ServerThread extends Thread {
             GameWaitingRoom gameWaitingRoom = GameWaitingRoomManager.getInstance().getGameWaitingRoom();
             gameWaitingRoom.leave(player);
 
-            System.out.println("SERVER: DELETE PLAYER ID = " + playerId);
             PlayerManager.getInstance().removePlayer(playerId);
 
             return null;

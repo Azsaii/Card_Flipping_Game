@@ -6,6 +6,9 @@ import java.awt.*;
 import static Client.GamePanel.GameScreenPanel.PLAYER1;
 import static Client.GamePanel.GameScreenPanel.PLAYER2;
 
+/**
+ * 게임 내 스코어를 붙이고 변경을 전담하는 클래스
+ */
 public class ScorePanel extends JPanel {
 
     static final int DEFAULT_SCORE_ADD = 10; // 카드 뒤집을 시 점수

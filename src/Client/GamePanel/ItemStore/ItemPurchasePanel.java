@@ -3,6 +3,7 @@ package Client.GamePanel.ItemStore;
 import Client.GamePanel.Card.CardPanel;
 import Client.GamePanel.Score.DefaultScoreStrategy;
 import Client.MainFrame;
+import Client.MusicManager;
 import Server.Data.ItemData;
 import Client.GamePanel.Score.DoubleScoreStrategy;
 import Client.GamePanel.Score.ScorePanel;
@@ -137,16 +138,21 @@ public class ItemPurchasePanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                // 아이템이 비활성화 상태이거나 이미 2개의 아이템의 쿨타임이 끝나지 않았으면 리턴
-                if (!itemActivated[i] || inUseItemDataCount == ITEM_PURCHASE_LIMIT) {
+                final ItemLabel[] source = {(ItemLabel) e.getSource()}; // 클릭된 레이블. 타이머 내부에서 사용하기 위해 final 선언됨
+
+                // 아이템이 비활성화 상태이거나 이미 2개의 아이템의 쿨타임이 끝나지 않았거나 스코어가 부족하면 리턴
+                if (!itemActivated[i] || inUseItemDataCount == ITEM_PURCHASE_LIMIT || Integer.valueOf(scorePanel.getScore(playerType)) < itemDatas[i].getItemPrice()) {
+                    MusicManager.getInstance().playSoundEffect("audio/cantBuy.wav");
                     return;
                 }
 
-                final ItemLabel[] source = {(ItemLabel) e.getSource()}; // 클릭된 레이블. 타이머 내부에서 사용하기 위해 final 선언됨
                 int itemId = source[0].getItemId(); // 아이템 id
                 int coolTime = itemDatas[i].getCoolTime(); // 쿨타임
-                int duration = itemDatas[i].getDuration(); // 쿨타임
+                int duration = itemDatas[i].getDuration(); // 효과 지속시간
+                String effectPath = "audio/" + itemId + ".wav"; // 효과음 경로
                 String command = itemDatas[i].getItemPath().split("/")[2].split("\\.")[0]; // 커맨드 알아내기
+
+                MusicManager.getInstance().playSoundEffect(effectPath); // 효과음 재생
 
                 // 아이템 사용 패널에 클릭한 아이템 추가되도록 업데이트
                 inUseItemDataCount++;
@@ -156,12 +162,11 @@ public class ItemPurchasePanel extends JPanel {
                     inUsePanel.attachInUseItem(itemDatas[i], String.valueOf(itemDatas[i].getDuration()), true);
                 }
 
-
                 // 아이템 사용을 서버에 알림
                 sendItemUseNotice(command);
 
                 // 클릭된 아이템 비활성화
-                deActiveItemPanel(i, source, duration, coolTime, itemId); // 클릭된 아이템 비활성화, 쿨타임 처리
+                deActiveItemPanel(i, source, duration, coolTime, itemId); // 클릭된 아이템 비활성화, 지속시간 / 쿨타임 처리 시작
             }
         });
 
@@ -215,6 +220,8 @@ public class ItemPurchasePanel extends JPanel {
             Timer timer = new Timer(1000, actionListener);
             timer.start();
         } else { // 지속형 아이템은 지속시간이 끝난 후 쿨타임 시작
+
+            // 지속시간이 끝났을 때 실행
             Timer delayTimer = new Timer(duration * 1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -227,6 +234,8 @@ public class ItemPurchasePanel extends JPanel {
                     ((Timer)e.getSource()).stop();
                 }
             });
+
+            // 지속시간 중에 1초씩 감소시킴
             Timer updateCoolTimeTimer = new Timer(1000, new ActionListener() {
                 int remainingDelay = duration;
                 @Override
@@ -260,10 +269,10 @@ public class ItemPurchasePanel extends JPanel {
 
         MainFrame.dataTranslatorWrapper.broadcast(request);
     }
-
-    // 아이스 에이지 사용 시 모든 아이탬 패널 비활성화
+    
+    // 상대가 아이스 에이지 사용 시 모든 아이탬 패널 비활성화
     // 아이스 에이지 쿨타임이 끝나면 다시 활성화된다.
-    public void deActiveItemPanel(double delay){
+    public void deActiveAllItemPanel(double duration){
         for(int i = 0; i < 6; i++){
             itemActivated[i] = false;
             setImage(itemLabels[i], i, itemDatas[i].getItemDeactivePath()); // 비활성화 이미지 설정
@@ -271,23 +280,29 @@ public class ItemPurchasePanel extends JPanel {
             // 지정된 시간 후에 아이템 패널을 다시 활성화
             Timer timer = new Timer(1000, null);
             int finalI = i;
-            int finalI1 = i;
             timer.addActionListener(new ActionListener() {
-                double remainingDelay = delay;
+                double remainingDelay = duration;
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     // delay 감소 및 쿨타임 업데이트
                     remainingDelay--;
 
                     // 쿨타임이 끝났을 때 종료 처리
-                    if (remainingDelay <= 0) {
+                    if (remainingDelay <= 0 && finalI != 5) { // 아이스 에이지 아이템은 활성화 제외. 쿨타임 지난 후에 활성화 해야한다.
                         itemActivated[finalI] = true; // 아이템 활성화
-                        setImage(itemLabels[finalI], finalI, itemDatas[finalI1].getItemPath()); // 아이템 활성화 이미지로 세팅
+                        setImage(itemLabels[finalI], finalI, itemDatas[finalI].getItemPath()); // 아이템 활성화 이미지로 세팅
                         timer.stop();
                     }
                 }
             });
             timer.start();
         }
+    }
+
+    // 상대방이 아이스 에이지 사용했을 때
+    // 지속시간이 끝나고 나의 아이스 에이지 아이템을 활성화하는 메서드
+    public void activeIceAge(int index){
+        itemActivated[index] = true;
+        setImage(itemLabels[index], index, itemDatas[index].getItemPath());
     }
 }

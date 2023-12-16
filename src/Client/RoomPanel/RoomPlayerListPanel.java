@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * 게임 방에서 플레이어 목록을 업데이트한느 클래스
+ */
 public class RoomPlayerListPanel extends JPanel {
 
     RoomPlayerListPanel() {

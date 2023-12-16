@@ -36,6 +36,10 @@ public class CardUpdateThread extends Thread{
             if(response == null) break;
 
             String command = (String) response.get("command");
+            if(command.equals("game_exit")) { // 게임 종료 시 게임 채팅 스레드 종료
+                return;
+            }
+
             long senderId = (long) response.get("senderId"); // 카드 뒤집은 플레이어 ID
             ImageIcon img = cardPanel.blackCardImg;
 
@@ -56,5 +60,4 @@ public class CardUpdateThread extends Thread{
             }
         }
     }
-
 }

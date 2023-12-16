@@ -1,7 +1,6 @@
 package Client;
 
 import Client.GamePanel.GameScreenPanel;
-import Client.GamePanel.Timer.GameStartTimerPanel;
 import Client.MainPanel.MainScreenPanel;
 import Client.RoomPanel.RoomScreenPanel;
 import Network.DataTranslator;
@@ -18,8 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 메인 프레임입니다.
+ * 게임을 시작하는 메인 프레임입니다.
  * 메인 화면, 방 화면, 게임 화면 패널을 붙입니다.
+ * 서버와 연결합니다.
+ * 화면 전환 기능을 담당합니다.
  */
 public class MainFrame extends JFrame {
     public static DataTranslatorWrapper dataTranslatorWrapper = new DataTranslatorWrapper();
@@ -33,7 +34,7 @@ public class MainFrame extends JFrame {
     public static long roomId;
     private CardLayout cardLayout;
     private JPanel mainPanel;
-    private GameStartTimerPanel startPanel;
+
 
     private MainScreenPanel mainScreenPanel;
     private GameScreenPanel gameScreenPanel;
@@ -42,10 +43,8 @@ public class MainFrame extends JFrame {
     public MainFrame() throws IOException {
 
         /* 서버 별 입출력 스트림을 다루는 객체 생성 */
-        Map<String, Object> GameDataInitialServerResponse = new DataTranslator("localhost", 5000).receiveData(); //클라이언트는 GameDataInitialServer에 먼저 연결
-        playerId = (long) GameDataInitialServerResponse.get("playerId"); // GameDataInitialServer에서 playerId를 얻습니다.
-
-        System.out.println("mainframe - playerId id = " + playerId);
+        Map<String, Object> GameDataInitialServerResponse = new DataTranslator("localhost", 5000).receiveData(); //클라이언트는 GameDataInitialServer 에 먼저 연결
+        playerId = (long) GameDataInitialServerResponse.get("playerId"); // GameDataInitialServer 에서 playerId를 얻습니다.
         
         dataTranslatorWrapper.add(ServerName.GAME_ROOM_DATA_SERVER, new DataTranslator("localhost", 5001));
         dataTranslatorWrapper.add(ServerName.SCREEN_UI_UPDATE_SERVER, new DataTranslator("localhost", 5002));
@@ -82,32 +81,6 @@ public class MainFrame extends JFrame {
         cardLayout.show(mainPanel, "mainScreenPanel");
 
         add(mainPanel);
-        
-//        // startPanel 에서 5초를 센 후 이벤트가 발생하면 GameScreen 으로 넘어간다.
-//        startPanel.setActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                cardLayout.show(mainPanel, "GameScreen");
-//            }
-//        });
-//
-//        /**
-//         * 이 부분 찬형코드에서 방에 두명 모이고 게임 시작할 때 작동하도록 옮겨야함.
-//         */
-//        // 메인 화면에 play 버튼을 추가하고, 클릭 시 게임 화면으로 전환하도록 설정
-//        JButton playButton = new JButton("Play");
-//        playButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                /**
-//                 * 개발 중이므로 타이머 임시 제거함. 작업 끝나고 살려야한다.
-//                 */
-////                cardLayout.show(mainPanel,  "StartPanel");
-////                startPanel.startTimer(); // 게임 시작 패널의 타이머 시작
-//
-//                cardLayout.show(mainPanel,  "GameScreen");
-//            }
-//        });
-
         
         // 서버로부터 화면 업데이트 메시지 받아 화면 전환하는 스레드
         Thread updateScreenThread = new Thread(() -> {
