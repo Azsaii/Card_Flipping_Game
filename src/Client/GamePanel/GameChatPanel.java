@@ -1,102 +1,73 @@
 package Client.GamePanel;
 
+import Client.Chat.ChatThread;
+import Client.Chat.RoomSendChatAction;
 import Client.MainFrame;
-import Client.MainPanel.MainChatPanel;
-import Client.RoomPanel.RoomChatPanel;
 import Network.DataTranslator;
 import Network.ServerName;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GameChatPanel extends JPanel {
 
-    JButton button;
-    JTextField textField;
-    Thread gameChatThread;
+    private JTextPane textPane;  // JTextArea 대신 JTextPane 사용
+    private JTextField textField;
+    private JScrollPane scrollPane;
+    private ChatThread chatThread;
 
+    public RoomSendChatAction roomSendChatAction;
     public GameChatPanel(){
-        setLayout(new BorderLayout());
 
-        // 채팅 내역이 표시될 JTextArea
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
+        setLayout(null);  // 배치 관리자 제거
+        setOpaque(false);
 
-        // 채팅 내역 영역을 스크롤 가능하게 함
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(340, 700)); // 패널 전체 크기의 90% 할당
-        scrollPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        textPane = new JTextPane();  // JTextPane 생성
+        scrollPane = new JScrollPane(textPane);
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 5, 0), // 컴포넌트에 여백 추가
+                BorderFactory.createLineBorder(Color.BLACK) // 테두리 추가
+        ));
 
-        // 채팅 입력 영역
-        JPanel chatInputPanel = new JPanel(new BorderLayout());
-        chatInputPanel.setPreferredSize(new Dimension(340, 80)); // 패널 전체 크기의 10% 할당
-        chatInputPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // 테두리
-
-        // 채팅 입력 필드
         textField = new JTextField();
-        textField.addActionListener(new RoomSendChatAction());
-        chatInputPanel.add(textField, BorderLayout.CENTER);
+        textField.setMargin(new Insets(5, 5, 5, 5));  // 텍스트 필드의 내부 여백 설정
+        textField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(5, 0, 5, 0), // 컴포넌트에 여백 추가
+                BorderFactory.createLineBorder(Color.BLACK) // 테두리 추가
+        ));
 
-        // 채팅 전송 버튼 이미지
-        Image scaledImage1 = new ImageIcon("images/send-icon.png").getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT);
-        ImageIcon imageIcon = new ImageIcon(scaledImage1);
+        // 폰트 설정
+        Font font = new Font("돋움", Font.PLAIN, 15);
+        textPane.setFont(font);
+        textField.setFont(font);
+        textPane.setMargin(new Insets(5, 5, 5, 5));
 
-        // 채팅 전송 버튼
-        button = new JButton(imageIcon);
-        button.addActionListener(new RoomSendChatAction());
-        chatInputPanel.add(button, BorderLayout.EAST);
+        add(scrollPane);
+        add(textField);
 
-        // 채팅 영역과 채팅 입력 영역을 프레임에 추가
-        add(scrollPane, BorderLayout.NORTH);
-        add(chatInputPanel, BorderLayout.SOUTH);
+        // 메시지 전송 이벤트 클래스
+        roomSendChatAction = new RoomSendChatAction(textField);
+        roomSendChatAction.setCommand("game_chat");
+        textField.addActionListener(roomSendChatAction);
 
-        setVisible(true);
-
-        //방 채팅 문자를 받는 스레드
-        gameChatThread = new Thread(() -> {
-
-            DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.GAME_CHAT_UI_UPDATE_SERVER);
-
-            while (true) {
-                Map<String, Object> response = dataTranslator.receiveData();
-                if(response == null) break;
-                String command = (String) response.get("command");
-
-                if (command.equals("game_chat")) {
-                    String message = (String) response.get("message");
-
-                    textArea.append(message);
-                    textArea.setCaretPosition(textArea.getText().length());
-                } else if(command.equals("game_exit")) return; // 게임 종료 시 스레드 종료
-            }
-        });
+        //방 채팅 문자를 받는 스레드 생성
+        chatThread = new ChatThread("game_chat", ServerName.GAME_CHAT_UI_UPDATE_SERVER, textPane);
     }
 
-    public void startGameChatThread(){gameChatThread.start();}
+    // 컴포넌트 그리기 관련 메서드
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-    class RoomSendChatAction implements ActionListener
-    {
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        int margin = 5;  // 마진 설정
+        int gap = 5;  // 컴포넌트 사이의 간격 설정
+        int width = 325;
+        int height1 = 700;
+        int height2 = 50;
 
-            if (e.getSource() == button || e.getSource() == textField) {
-                String message =  String.format("[%s] %s\n", "플레이어 " + MainFrame.playerId, textField.getText());
-
-                Map<String, Object> request = new HashMap<>();
-
-                request.put("command", "game_chat");
-                request.put("roomId", MainFrame.roomId);
-                request.put("message", message);
-
-                MainFrame.dataTranslatorWrapper.broadcast(request);
-
-                textField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
-                textField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
-            }
-        }
+        scrollPane.setBounds(margin, margin, width, height1);
+        textField.setBounds(margin, height1 + margin + gap, width, height2);
     }
+
+    public void startGameChatThread(){chatThread.start();} // 게임 채팅 스레드 작동
 }

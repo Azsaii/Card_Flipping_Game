@@ -37,11 +37,11 @@ public class ItemPurchasePanel extends JPanel {
     private static final String pathDefault = "images/items/";
 
     // 아이템 데이터
-    public static final ItemData RANDOM_FLIP = new ItemData(1, "랜덤 뒤집개", pathDefault + "RANDOM_FLIP.PNG", pathDefault + "RANDOM_FLIP_DE.PNG", 50, "모든 카드를 랜덤 색으로 재배치합니다.\n상대의 카드가 뒤집힌 수만큼 스코어를 빼앗습니다.", 4.0);
+    public static final ItemData RANDOM_FLIP = new ItemData(1, "랜덤 뒤집개", pathDefault + "RANDOM_FLIP.PNG", pathDefault + "RANDOM_FLIP_DE.PNG", 60, "모든 카드를 랜덤 색으로 재배치합니다.\n상대의 카드가 뒤집힌 수만큼 스코어를 빼앗습니다.", 6.0);
     public static final ItemData BLACK_FOG = new ItemData(2, "검은 안개", pathDefault + "BLACK_FOG.PNG", pathDefault + "BLACK_FOG_DE.PNG", 50, "10초 동안상대가 랜덤한 절반의 카드 색을 보지 못하게 합니다.", 10.0);
     public static final ItemData GOLD_FLIP = new ItemData(3, "황금 뒤집개", pathDefault + "GOLD_FLIP.PNG", pathDefault + "GOLD_FLIP_DE.PNG", 70, "모든 카드를 플레이어의 색으로 뒤집습니다.", 7.0);
     public static final ItemData DOUBLE_EVENT = new ItemData(4, "더블 이벤트", pathDefault + "DOUBLE_EVENT.PNG", pathDefault + "DOUBLE_EVENT_DE.PNG", 100, "10초 동안 모든 방법으로 얻는 스코어 2배가 됩니다.", 10.0);
-    public static final ItemData CROSS = new ItemData(5, "크로스", pathDefault + "CROSS.PNG", pathDefault + "CROSS.PNG", 100, "10초 동안 클릭한 카드의 주변 상하좌우 카드가 같이 뒤집어집니다.", 10.0);
+    public static final ItemData CROSS = new ItemData(5, "크로스", pathDefault + "CROSS.PNG", pathDefault + "CROSS_DE.PNG", 100, "10초 동안 클릭한 카드의 주변 상하좌우 카드가 같이 뒤집어집니다.", 10.0);
     public static final ItemData ICE_AGE = new ItemData(6, "얼음", pathDefault + "ICE_AGE.PNG", pathDefault + "ICE_AGE_DE.PNG", 70, "7초 동안 모든 카드가 뒤집을 수 없는 상태로 변합니다.", 7.0);
     private ItemData[] itemDatas = new ItemData[ITEM_COUNT];
     private ItemLabel[] itemLabels = new ItemLabel[ITEM_COUNT];
@@ -201,7 +201,7 @@ public class ItemPurchasePanel extends JPanel {
     public void sendItemUseNotice(String command){
         Map<String, Object> request = cardPanel.setDefaultRequest(command);
 
-        if(command == COMMAND_RANDOM_FLIP) {
+        if(command.equals(COMMAND_RANDOM_FLIP)) {
             boolean[] randomCardArray = new boolean[24];
             Random rand = new Random();
             for(int index = 0; index < randomCardArray.length; index++) {

@@ -119,11 +119,11 @@ public class MainFrame extends JFrame {
                 if(response == null) break;
                 String command = (String) response.get("command");
 
-                if(command.equals("메인 화면 전환")) {
+                if(command.equals("screen_change_main")) {
                     updateScreen(MAINSCREEN);
-                } else if (command.equals("방 화면 전환")) {
+                } else if (command.equals("screen_change_room")) {
                     updateScreen(ROOMSCREEN);
-                } else if (command.equals("게임 화면 전환")) {
+                } else if (command.equals("screen_change_game")) {
                     gameRoom = (GameRoom) response.get("gameRoom");
                     updateScreen(GAMESCREEN);
                 }

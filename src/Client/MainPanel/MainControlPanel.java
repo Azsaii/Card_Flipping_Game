@@ -1,7 +1,10 @@
 package Client.MainPanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 메인화면 채팅 패널, 방생성/나가기 버튼이 있는 패널을 붙이는 패널
@@ -11,8 +14,21 @@ public class  MainControlPanel extends JPanel {
 
     private MainRoomButtonPanel roomControlPanel;
     private MainChatPanel mainChatPanel;
+    private Image backgroundImage;
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+    }
 
     public MainControlPanel() {
+
+        try {
+            backgroundImage = ImageIO.read(new File("images/background.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));

@@ -12,7 +12,6 @@ import Server.ServerThread;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 public class ItemUIUpdateServer extends ServerTemplate {
@@ -45,49 +44,38 @@ class ItemUIUpdateServerThread extends ServerThread {
     static final String DOUBLE_EVENT = "DOUBLE_EVENT";
     static final String CROSS = "CROSS";
     static final String ICE_AGE = "ICE_AGE";
+
+    private PlayerManager playerManager = PlayerManager.getInstance();
     public ItemUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
     }
 
+    /**
+     * 명령어에 따라 플레이어에게 응답을 돌려준다.
+     */
     @Override
-    public void run() {
-        PlayerManager playerManager = PlayerManager.getInstance();
+    public void sendResponse(Map<String, Object> request, String command) {
 
-        while(true) {
+        if(command.equals(RANDOM_FLIP) || command.equals(BLACK_FOG) || command.equals(GOLD_FLIP) || command.equals(DOUBLE_EVENT) || command.equals(CROSS) ||command.equals(ICE_AGE)){
 
-            /* 메시지 인터셉트 방지 */
-            try {
-                cyclicBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                throw new RuntimeException(e);
-            }
+            Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 
-            /* 요청을 받아 처리 */
-            Map<String, Object> request = checkexit();
-            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
+            System.out.println("서버: 아이템 사용됨 - " + command);
+            long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
+            Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
+            GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
 
-            String command = (String) request.get("command");
-            if(command.equals(RANDOM_FLIP) || command.equals(BLACK_FOG) || command.equals(GOLD_FLIP) || command.equals(DOUBLE_EVENT) || command.equals(CROSS) ||command.equals(ICE_AGE)){
+            /* 아이템 종류 별로 응답 객체에 데이터 추가 */
+            response.put("command", command); // 카드 상태 업데이트 명령 추가
+            response.put("senderId", playerId); // 카드 뒤집은 플레이어 ID 추가
 
-                Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
+            if(command.equals(RANDOM_FLIP)) response.put("randomCardArray", request.get("randomCardArray"));
 
-                System.out.println("서버: 아이템 사용됨 - " + command);
-                long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
-                Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
-                GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
-
-                /* 아이템 종류 별로 응답 객체에 데이터 추가 */
-                response.put("command", command); // 카드 상태 업데이트 명령 추가
-                response.put("senderId", playerId); // 카드 뒤집은 플레이어 ID 추가
-
-                if(command.equals(RANDOM_FLIP)) response.put("randomCardArray", request.get("randomCardArray"));
-
-                /* 상대에게 카드 업데이트 메시지 전송 */
-                List<Player> players = gameRoom.getPlayers();
-                for(Player player : players) { ////현재 플레이어가 속한 게임 방에 필요한 데이터를 보냅니다.
-                    DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ITEM_UI_UPDATE_SERVER);
-                    playerDataTranslator.sendData(response);
-                }
+            /* 상대에게 카드 업데이트 메시지 전송 */
+            List<Player> players = gameRoom.getPlayers();
+            for(Player player : players) { ////현재 플레이어가 속한 게임 방에 필요한 데이터를 보냅니다.
+                DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ITEM_UI_UPDATE_SERVER);
+                playerDataTranslator.sendData(response);
             }
         }
     }

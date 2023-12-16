@@ -37,6 +37,7 @@ public class CardUpdateThread extends Thread{
 
             String command = (String) response.get("command");
             long senderId = (long) response.get("senderId"); // 카드 뒤집은 플레이어 ID
+            ImageIcon img = cardPanel.blackCardImg;
 
             if (command.equals(CARD_UPDATE) && senderId != playerId) { // 상대방이 보낸 카드 업데이트 메시지일 때만 처리
                 String location[] = ((String) response.get("location")).split(","); // 뒤집은 카드 좌표
@@ -44,7 +45,9 @@ public class CardUpdateThread extends Thread{
                 int y = Integer.valueOf(location[1]);
 
                 CardLabel cardLabel = cardLabels[y][x];  // 배열에서 카드 레이블 찾기
-                ImageIcon img = (playerId == gameRoom.getLeader().getId()) ? cardPanel.redCardImg : cardPanel.greenCardImg;  // 플레이어가 방장이면 해당 위치의 카드를 green 이미지로 변경
+
+                // 플레이어가 방장이면 해당 위치의 카드를 green 이미지로 변경, 검은 안개 효과 고려
+                if(!cardPanel.isBlind[y * 6 + x]) img = (playerId == gameRoom.getLeader().getId()) ? cardPanel.redCardImg : cardPanel.greenCardImg;
                 int targetColor = (playerId == gameRoom.getLeader().getId()) ? RED_CARD : GREEN_CARD;// 플레이어가 방장이면 카드를 초록색으로 변경
                 int changeScoreTarget = (cardPanel.playerType == PLAYER1) ? PLAYER2 : PLAYER1; // 상대방 스코어 변경
 

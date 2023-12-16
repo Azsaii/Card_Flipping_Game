@@ -32,69 +32,58 @@ public class RoomControlUIUpdateServer extends ServerTemplate {
 
 class RoomControlUIUpdateServerThread extends ServerThread {
 
+    private GameRoomManager gameRoomManager = GameRoomManager.getInstance();
+
     public RoomControlUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
     }
 
+    /**
+     * 명령어에 따라 플레이어에게 응답을 돌려준다.
+     */
     @Override
-    public void run() {
+    public void sendResponse(Map<String, Object> request, String command) {
 
+        if (command.equals("room_enter") || command.equals("game_ready") || command.equals("game_not_ready") | command.equals("room_exit")) {
 
-        GameRoomManager gameRoomManager = GameRoomManager.getInstance();
+            long roomId = (long) request.get("roomId");
 
-        while (true) {
-            try {
-                cyclicBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                throw new RuntimeException(e);
+            GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("command", "game_start_update");
+
+            if (command.equals("room_exit") && gameRoom == null) {
+                return;
             }
 
-            /* 요청을 받아 처리 */
-            Map<String, Object> request = checkexit();
-            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
+            if (gameRoom.isAllReady()) {
+                response.put("result", "OK");
+            }else {
+                response.put("result", "FAIL");
+            }
 
-            String command = (String) request.get("command");
-            if (command.equals("방 입장") || command.equals("게임 준비") || command.equals("게임 준비 미완료") | command.equals("방 나가기")) {
+            List<Player> players = gameRoom.getPlayers();
 
-                long roomId = (long) request.get("roomId");
-
-                GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("command", "게임 시작 UI 업데이트");
-
-                if (command.equals("방 나가기") && gameRoom == null) {
-                    continue;
-                }
-
-                if (gameRoom.isAllReady()) {
-                    response.put("result", "OK");
-                }else {
-                    response.put("result", "FAIL");
-                }
-
-                List<Player> players = gameRoom.getPlayers();
-
-                for (Player player : players) {
-                    if (player == gameRoom.getLeader()) {
-                        DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
-                        playerDataTranslator.sendData(response);
-                    }
-                }
-            } else if (command.equals("게임 시작")) { // 버튼 초기화를 위함
-                long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 id 가져옴.
-                GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
-                Map<String, Object> response = new HashMap<>();
-                response.put("command", "init_btn");
-
-                List<Player> players = gameRoom.getPlayers();
-
-                for(Player player : players) {
+            for (Player player : players) {
+                if (player == gameRoom.getLeader()) {
                     DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
                     playerDataTranslator.sendData(response);
                 }
-
             }
+        } else if (command.equals("game_start")) { // 버튼 초기화를 위함
+            long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 id 가져옴.
+            GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("command", "init_btn");
+
+            List<Player> players = gameRoom.getPlayers();
+
+            for(Player player : players) {
+                DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
+                playerDataTranslator.sendData(response);
+            }
+
         }
     }
 }

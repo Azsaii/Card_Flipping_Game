@@ -10,10 +10,13 @@ import Server.Data.Player;
 import Server.Manager.GameRoomManager;
 import Server.Manager.PlayerManager;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * 게임 화면 패널 배치만 하는 클래스입니다.
@@ -30,6 +33,14 @@ public class GameScreenPanel extends JPanel {
     private CardPanel cardPanel; // 카드 패널 임시로 플레이어1로 설정.
     private GameTimerLimitPanel timeLimitPanel; // 타이머 패널
     private GameChatPanel chatPanel; // 채팅 패널
+
+    private Image backgroundImage;
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+    }
 
     // 패널 위치, 크기 정하고 붙이기
     public GameScreenPanel(long playerId){
@@ -60,7 +71,7 @@ public class GameScreenPanel extends JPanel {
         setPanelProperties(scorePanel, 350, 0, 800, 100);
         setPanelProperties(timeLimitPanel, 650, 100, 200, 50);
         setPanelProperties(cardPanel, 350, 100, 800, 700);
-        setPanelProperties(chatPanel, 1150, 0, 350, 800);;
+        setPanelProperties(chatPanel, 1150, 0, 350, 800);
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -69,5 +80,11 @@ public class GameScreenPanel extends JPanel {
             timeLimitPanel.startTimer();
             }
         });
+
+        try {
+            backgroundImage = ImageIO.read(new File("images/background.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -172,18 +172,19 @@ public class CardPanel extends JPanel {
     }
 
     // 랜덤, 황금 뒤집개 아이템 사용 시 카드 뒤집는 메서드
+    // 검은 안개 효과를 받고 있으면 카드 이미지는 black 카드이고 색 상태만 변경된다.
     public void setCardsByBoolArray(boolean[] cardArray) {
 
         for(int i = 0; i < 24; i++) {
             int x = i % 6; // 카드 x좌표
             int y = i / 6; // 카드 y좌표
 
-            // cardArray 값에 따라 카드 색상 설정
-            if(cardArray[i]) { // true이면 레드 카드
-                updateCardData(cardLabels[y][x], redCardImg, RED_CARD);
-            } else { // false이면 그린 카드
-                updateCardData(cardLabels[y][x], greenCardImg, GREEN_CARD);
-            }
+            ImageIcon icon = blackCardImg;
+            int colorState = (cardArray[i]) ? RED_CARD : GREEN_CARD;
+            if(!isBlind[i]) icon = (cardArray[i]) ? redCardImg : greenCardImg;
+
+            System.out.println("colorState: " + colorState + ", icon: " + icon + ", isblind[" + i + "]: " + isBlind[i]);
+            updateCardData(cardLabels[y][x], icon, colorState);
         }
     }
 
@@ -239,6 +240,7 @@ public class CardPanel extends JPanel {
     }
 
     // 황금 뒤집개 사용 시 스코어 변경
+    // resultCardArray 배열은 황금 뒤집개 적용 후 카드배열의 색을 나타낸다.
     public boolean[] updateScoreByGoldFlip(long senderId) {
         boolean state = true;
         boolean[] resultCardArray = new boolean[24];
@@ -254,8 +256,8 @@ public class CardPanel extends JPanel {
 
         if(playerId == senderId){ // 자신이 사용한 경우
             switch(playerType){
-                case PLAYER1: state = false; addScore(redCount, PLAYER1); break; // 모든 카드를 green 카드로 변경, 기존 red 카드 수만큼 점수 추가
-                case PLAYER2: state = true; addScore(greenCount, PLAYER2); break; // 모든 카드를 red 카드로 변경, 기존 green 카드 수만큼 점수 추가
+                case PLAYER1: state = false; addScore(redCount, PLAYER1); break; // 기존 red 카드 수만큼 점수 추가
+                case PLAYER2: state = true; addScore(greenCount, PLAYER2); break; // 기존 green 카드 수만큼 점수 추가
             }
         } else { // 상대가 사용한 경우
             switch(playerType){
@@ -281,6 +283,7 @@ public class CardPanel extends JPanel {
 
         // 섞인 리스트의 앞 12개 요소에 해당하는 isBlind 배열의 값을 true로 변경
         for (int i = 0; i < 12; i++) {
+            System.out.println("blind i: " + list.get(i));
             isBlind[list.get(i)] = true;
         }
 

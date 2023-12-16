@@ -36,12 +36,14 @@ public class RoomControlPanel extends JPanel {
 
         this.roomChatPanel = roomChatPanel;
         setLayout(new GridLayout());
+        setOpaque(false);
+        final JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new GridBagLayout());
+        mainPanel.setOpaque(false);
 
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridBagLayout());
-
-        final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridBagLayout());
+        final JPanel exitBtnPanel = new JPanel();
+        exitBtnPanel.setOpaque(false);
+        exitBtnPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -49,7 +51,7 @@ public class RoomControlPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.weighty = 3.0;
         gbc.fill = GridBagConstraints.BOTH;
-        panel1.add(panel2, gbc);
+        mainPanel.add(exitBtnPanel, gbc);
         JButton exitButton = new JButton(exitIcon);
 
         exitButton.setOpaque(false);
@@ -62,7 +64,7 @@ public class RoomControlPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0, 5, 0, 0);
-        panel2.add(exitButton, gbc);
+        exitBtnPanel.add(exitButton, gbc);
 
         readyButton = new JButton(readyOutlineIcon);
         readyButton.setOpaque(false);
@@ -76,12 +78,11 @@ public class RoomControlPanel extends JPanel {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0, 0, 0, 5);
-        panel2.add(readyButton, gbc);
+        exitBtnPanel.add(readyButton, gbc);
 
         ImageIcon startIcon = new ImageIcon("images/start-icon.png");
 
         startButton = new JButton(startIcon);
-
         startButton.setOpaque(false);
         startButton.setContentAreaFilled(false);
         startButton.setBorderPainted(false);
@@ -92,7 +93,7 @@ public class RoomControlPanel extends JPanel {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(10, 0, 0, 0);
-        panel1.add(startButton, gbc);
+        mainPanel.add(startButton, gbc);
 
         readyButton.addActionListener(new ActionListener() {
             @Override
@@ -102,10 +103,10 @@ public class RoomControlPanel extends JPanel {
                 Map<String, Object> request = new HashMap<>();
 
                 if(button.getIcon() == readyOutlineIcon) {
-                    request.put("command", "게임 준비");
+                    request.put("command", "game_ready");
                     button.setIcon(readyFillIcon);
                 } else if (button.getIcon() == readyFillIcon) {
-                    request.put("command", "게임 준비 미완료");
+                    request.put("command", "game_not_ready");
                     button.setIcon(readyOutlineIcon);
                 }
 
@@ -122,7 +123,7 @@ public class RoomControlPanel extends JPanel {
 
                 Map<String, Object> request = new HashMap<>();
 
-                request.put("command", "게임 시작");
+                request.put("command", "game_start");
                 request.put("playerId", playerId);
                 request.put("roomId", MainFrame.roomId);
 
@@ -138,7 +139,7 @@ public class RoomControlPanel extends JPanel {
 
                 Map<String, Object> request = new HashMap<>();
 
-                request.put("command", "방 나가기");
+                request.put("command", "room_exit");
                 request.put("playerId", MainFrame.playerId);
                 request.put("roomId", MainFrame.roomId);
                 MainFrame.dataTranslatorWrapper.broadcast(request);
@@ -148,7 +149,7 @@ public class RoomControlPanel extends JPanel {
             }
         });
 
-        add(panel1);
+        add(mainPanel);
 
         Thread updateRoomControlThread = new Thread(() -> {
             DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.ROOM_CONTROL_UI_UPDATE_SERVER);
@@ -159,7 +160,7 @@ public class RoomControlPanel extends JPanel {
                 if(response == null) break;
                 String command = (String) response.get("command");
 
-                if (command.equals("게임 시작 UI 업데이트")) {
+                if (command.equals("game_start_update")) {
                     String result = (String) response.get("result");
                     if(result.equals("OK")) {
                         startButton.setEnabled(true);
@@ -168,7 +169,6 @@ public class RoomControlPanel extends JPanel {
                     }
                 } else if(command.equals("init_btn")){ // 버튼 초기화
                     setInitButtons();
-                    roomChatPanel.stopRoomChatThread(); // 채팅 스레드 정지
                 }
             }
         });

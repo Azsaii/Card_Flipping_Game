@@ -21,15 +21,14 @@ public class MainRoomButtonPanel extends JPanel  {
 
     public MainRoomButtonPanel() {
 
+        setOpaque(false);
         setLayout(new GridLayout(0, 2));
 
         ImageIcon createRoomIcon = new ImageIcon("images/createRoom-icon.png");
+        ImageIcon exitIcon = new ImageIcon("images/exit-icon.png");
 
-        JButton createRoomButton = new JButton(createRoomIcon);
-
-        createRoomButton.setOpaque(false);
-        createRoomButton.setContentAreaFilled(false);
-        createRoomButton.setBorderPainted(false);
+        JButton createRoomButton = setMainRoomButtons(createRoomIcon);
+        JButton exitButton = setMainRoomButtons(exitIcon);
 
         // 방 생성 로직 처리
         createRoomButton.addActionListener(new ActionListener() {
@@ -37,7 +36,7 @@ public class MainRoomButtonPanel extends JPanel  {
             public void actionPerformed(ActionEvent e) {
                 Map<String, Object> request = new HashMap<>();
 
-                request.put("command", "방 생성");
+                request.put("command", "room_add");
                 request.put("playerId", MainFrame.playerId);
 
                 MainFrame.dataTranslatorWrapper.broadcast(request);
@@ -50,16 +49,6 @@ public class MainRoomButtonPanel extends JPanel  {
             }
         });
 
-        add(createRoomButton);
-
-        ImageIcon exitIcon = new ImageIcon("images/exit-icon.png");
-
-        JButton exitButton = new JButton(exitIcon);
-
-        exitButton.setOpaque(false);
-        exitButton.setContentAreaFilled(false);
-        exitButton.setBorderPainted(false);
-
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,7 +56,16 @@ public class MainRoomButtonPanel extends JPanel  {
                 System.exit(0);
             }
         });
+    }
 
-        add(exitButton);
+    private JButton setMainRoomButtons(ImageIcon icon){
+        JButton btn = new JButton(icon);
+
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+
+        add(btn);
+        return btn;
     }
 }

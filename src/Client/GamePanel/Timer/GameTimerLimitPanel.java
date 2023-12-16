@@ -43,7 +43,7 @@ public class GameTimerLimitPanel extends JPanel {
         }
 
         // 1초마다 이벤트를 발생시키는 타이머를 생성합니다.
-        timer = new Timer(100, new ActionListener() {
+        timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timeLeft--; // 남은 시간을 1초 줄입니다.
@@ -74,7 +74,7 @@ public class GameTimerLimitPanel extends JPanel {
                     if (choice == 0 || choice == -1) { // 다이얼로그의 나가기 버튼을 눌렀거나 x 를 눌렀을 때
                         // 서버로 종료처리 메시지 전송
                         sendGameExit("game_exit");
-                        sendGameExit("방 나가기");
+                        sendGameExit("room_exit");
 
                         MainFrame.roomId = 0; //현재 플레이어의 roomId를 0으로 초기화
                         timeLeft = 60; // 타이머 시간 초기화

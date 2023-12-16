@@ -16,13 +16,13 @@ public class GameServer {
         gameDataInitialServer.attachTemplateServer(new ScreenUIUpdateServer(5002));
         gameDataInitialServer.attachTemplateServer(new RoomListUIUpdateServer(5003));
         gameDataInitialServer.attachTemplateServer(new PlayerStatusUIUpdateServer(5004));
-        gameDataInitialServer.attachTemplateServer(new RoomChatUIUpdateServer(5005));
-        gameDataInitialServer.attachTemplateServer(new ChatUIUpdateServer(5006));
+        gameDataInitialServer.attachTemplateServer(new RoomChatServer(5005));
+        gameDataInitialServer.attachTemplateServer(new MainChatServer(5006));
         gameDataInitialServer.attachTemplateServer(new RoomControlUIUpdateServer(5007));
 
         gameDataInitialServer.attachTemplateServer(new CardUIUpdateServer(5010));
         gameDataInitialServer.attachTemplateServer(new ItemUIUpdateServer(5011));
-        gameDataInitialServer.attachTemplateServer(new GameChatUIUpdateServer(5012));
+        gameDataInitialServer.attachTemplateServer(new GameChatServer(5012));
 
         //데이터 초기화 서버 스레드 동작
         new Thread(gameDataInitialServer).start();

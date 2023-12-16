@@ -40,50 +40,37 @@ public class CardUIUpdateServer extends ServerTemplate {
 class CardUIUpdateServerThread extends ServerThread {
 
     public static final String CARD_UPDATE = "CARD_UPDATE";
+    private PlayerManager playerManager = PlayerManager.getInstance();
 
     public CardUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
     }
 
+    /**
+     * 명령어에 따라 플레이어에게 응답을 돌려준다.
+     */
     @Override
-    public void run() {
-        PlayerManager playerManager = PlayerManager.getInstance();
+    public void sendResponse(Map<String, Object> request, String command) {
 
-        while(true) {
+        /* 카드 상태 업데이트 관련 요청 처리 */
+        if (command.equals(CARD_UPDATE)) {
 
-            /* 메시지 인터셉트 방지 */
-            try {
-                cyclicBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                throw new RuntimeException(e);
-            }
+            long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
+            Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
+            GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
 
-            /* 요청을 받아 처리 */
-            Map<String, Object> request = checkexit();
-            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
+            Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
 
-            String command = (String) request.get("command");
+            /* 응답 객체에 데이터 추가 */
+            response.put("command", CARD_UPDATE); // 카드 상태 업데이트 명령 추가
+            response.put("senderId", playerId); // 카드 뒤집은 플레이어 ID 추가
+            response.put("location", request.get("location"));
 
-            /* 카드 상태 업데이트 관련 요청 처리 */
-            if (command.equals(CARD_UPDATE)) {
-
-                long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID 파싱
-                Player currentPlayer = playerManager.getPlayer(playerId); //현재 플레이어를 찾기
-                GameRoom gameRoom = GameRoomManager.getInstance().getGameRoom(currentPlayer);
-
-                Map<String, Object> response = new HashMap<>(); // 요청에 대한 응답 객체
-
-                /* 응답 객체에 데이터 추가 */
-                response.put("command", CARD_UPDATE); // 카드 상태 업데이트 명령 추가
-                response.put("senderId", playerId); // 카드 뒤집은 플레이어 ID 추가
-                response.put("location", request.get("location"));
-
-                /* 상대에게 카드 업데이트 메시지 전송 */
-                List<Player> players = gameRoom.getPlayers();
-                for(Player player : players) { ////현재 플레이어가 속한 게임 방에 필요한 데이터를 보냅니다.
-                    DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.CARD_UI_UPDATE_SERVER);
-                    playerDataTranslator.sendData(response);
-                }
+            /* 상대에게 카드 업데이트 메시지 전송 */
+            List<Player> players = gameRoom.getPlayers();
+            for(Player player : players) { ////현재 플레이어가 속한 게임 방에 필요한 데이터를 보냅니다.
+                DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.CARD_UI_UPDATE_SERVER);
+                playerDataTranslator.sendData(response);
             }
         }
     }

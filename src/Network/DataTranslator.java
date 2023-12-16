@@ -1,7 +1,9 @@
 package Network;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Map;
 
 //데이터 송수신을 위한 클래스
@@ -47,9 +49,12 @@ public class DataTranslator{
                     return (Map<String, Object>) obj;
                 }
                 // 메타 데이터일 경우 무시하고 다음 데이터를 읽음
+            } catch (SocketException e){
+                System.out.println("Ends the game...");
+                return null; // 스트림이 닫힌 경우(플레이어가 게임 종료한 경우) null 반환
             } catch (IOException e) {
                 e.printStackTrace();
-                return null;  // 스트림이 닫힌 경우 null 반환
+                return null;
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

@@ -35,74 +35,61 @@ public class ScreenUIUpdateServer extends ServerTemplate {
 }
 class ScreenUIUpdateServerThread extends ServerThread {
 
+    private GameRoomManager gameRoomManager = GameRoomManager.getInstance();
+    private PlayerManager playerManager = PlayerManager.getInstance();
 
     public ScreenUIUpdateServerThread(DataTranslator dataTranslator, CyclicBarrier cyclicBarrier) {
         super(dataTranslator, cyclicBarrier);
     }
 
+    /**
+     * 명령어에 따라 플레이어에게 응답을 돌려준다.
+     */
     @Override
-    public void run() {
+    public void sendResponse(Map<String, Object> request, String command) {
 
-        GameRoomManager gameRoomManager = GameRoomManager.getInstance();
-        PlayerManager playerManager = PlayerManager.getInstance();
+        if (command.equals("room_add") || command.equals("room_enter")) {
 
-        while (true) { //각 플레이어들이 보낸 명령어를 처리하는 구간
-            try {
-                cyclicBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                throw new RuntimeException(e);
+            if (command.equals("room_enter")) {
+                long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID를 가져옴.
+                long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 ID를 가져옴.
+
+                Player currentPlayer = playerManager.getPlayer(playerId); //플레이어를 찾음.
+
+                if(!(gameRoomManager.isPlayerInRoom(roomId, currentPlayer))) { //현재 플레이어가 해당 ID 값을 가진 게임 방에 입장 되어 있지 않다면 화면 전환을 취소함
+                    return;
+                }
             }
 
-            /* 요청을 받아 처리 */
-            Map<String, Object> request = checkexit();
-            if(request == null) break; // 클라이언트가 게임 종료한 경우 루프 빠져나간다.
+            Map<String, Object> response = new HashMap<>();
+            response.put("command", "screen_change_room");
 
-            String command = (String) request.get("command");
-            if (command.equals("방 생성") || command.equals("방 입장")) {
+            dataTranslator.sendData(response);
+        }else if (command.equals("room_exit")) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("command", "screen_change_main");
 
-                if (command.equals("방 입장")) {
-                    long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 ID를 가져옴.
-                    long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 ID를 가져옴.
+            dataTranslator.sendData(response);
 
-                    Player currentPlayer = playerManager.getPlayer(playerId); //플레이어를 찾음.
+        }else if (command.equals("game_start")) { // MainFrame 에서 받고 화면을 업데이트한다.
+            long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 id 가져옴
+            long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 id 가져옴.
 
-                    if(!(gameRoomManager.isPlayerInRoom(roomId, currentPlayer))) { //현재 플레이어가 해당 ID 값을 가진 게임 방에 입장 되어 있지 않다면 화면 전환을 취소함
-                        continue;
-                    }
-                }
+            Player sendPlayer = playerManager.getPlayer(playerId);
+            GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
+            sendPlayer.setGameRoom(gameRoom);
 
-                Map<String, Object> response = new HashMap<>();
-                response.put("command", "방 화면 전환");
+            Map<String, Object> response = new HashMap<>();
+            response.put("command", "screen_change_game");
+            response.put("player", sendPlayer); // 클라이언트의 플레이어 객체 전달
+            response.put("gameRoom", gameRoom); // 클라이언트의 게임 방 객체 전달
 
-                dataTranslator.sendData(response);
-            }else if (command.equals("방 나가기")) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("command", "메인 화면 전환");
+            List<Player> players = gameRoom.getPlayers();
 
-                dataTranslator.sendData(response);
-
-            }else if (command.equals("게임 시작")) { // MainFrame 에서 받고 화면을 업데이트한다.
-                long playerId = (long) request.get("playerId"); // 클라이언트가 보낸 플레이어 id 가져옴
-                long roomId = (long) request.get("roomId"); // 클라이언트가 보낸 방 id 가져옴.
-
-                Player sendPlayer = playerManager.getPlayer(playerId);
-                GameRoom gameRoom = gameRoomManager.getGameRoom(roomId);
-                sendPlayer.setGameRoom(gameRoom);
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("command", "게임 화면 전환");
-                response.put("player", sendPlayer); // 클라이언트의 플레이어 객체 전달
-                response.put("gameRoom", gameRoom); // 클라이언트의 게임 방 객체 전달
-
-                List<Player> players = gameRoom.getPlayers();
-
-                for(Player player : players) {
-                    DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.SCREEN_UI_UPDATE_SERVER);
-                    playerDataTranslator.sendData(response);
-                }
-
+            for(Player player : players) {
+                DataTranslator playerDataTranslator = player.getDataTranslatorWrapper().get(ServerName.SCREEN_UI_UPDATE_SERVER);
+                playerDataTranslator.sendData(response);
             }
-
         }
     }
 }

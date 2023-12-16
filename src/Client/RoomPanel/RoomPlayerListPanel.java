@@ -6,17 +6,21 @@ import Network.ServerName;
 import Server.Data.GameRoom;
 import Server.Data.Player;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public class RoomPlayerListPanel extends JPanel {
 
-
     RoomPlayerListPanel() {
 
         setLayout(new GridLayout(0, 2, 10, 0));
+        setOpaque(false);
+
 
         Thread updatePlayerStatusThread = new Thread(() -> {
             DataTranslator dataTranslator = MainFrame.dataTranslatorWrapper.get(ServerName.PLAYER_STATUS_UI_UPDATE_SERVER);
@@ -27,7 +31,7 @@ public class RoomPlayerListPanel extends JPanel {
                 if(response == null) break;
                    String command = (String) response.get("command");
 
-                    if (command.equals("플레이어 정보 업데이트")) {
+                    if (command.equals("player_info_update")) {
 
                         GameRoom gameRoom = (GameRoom) response.get("GameRoom");
 
@@ -35,56 +39,55 @@ public class RoomPlayerListPanel extends JPanel {
 
                         for (Player player : gameRoom.getPlayers()) {
 
-                            final JPanel panel = new JPanel();
+                            // 패널 생성
+                            final JPanel mainPanel = new JPanel();
                             Border border = BorderFactory.createLineBorder(Color.BLACK, 2);
-                            panel.setBorder(border);
+                            mainPanel.setBorder(border);
+                            mainPanel.setOpaque(false);
+                            mainPanel.setLayout(new BorderLayout(0, 0));
 
-                            panel.setLayout(new BorderLayout(0, 0));
+                            JPanel southPanel = new JPanel();
+                            southPanel.setLayout(new BorderLayout(0, 0));
+                            southPanel.setOpaque(false);
 
-                            ImageIcon imageIcon = null;
-
+                            // 방장 표시 아이콘 추가
+                            ImageIcon crownImageIcon = null;
                             if(gameRoom.getLeader() == player) {
-                                imageIcon = new ImageIcon("images/crown-icon-fill.png");
+                                crownImageIcon = new ImageIcon("images/crown-icon-fill.png");
                             }else {
-                                imageIcon = new ImageIcon("images/crown-icon-outline.png");
+                                crownImageIcon = new ImageIcon("images/crown-icon-outline.png");
                             }
+                            JLabel crownImg = new JLabel(crownImageIcon);
 
-                            JLabel crownImg = new JLabel(imageIcon);
-                            panel.add(crownImg, BorderLayout.NORTH);
+                            // 프로필 아이콘 추가
+                            ImageIcon profileImageIcon = new ImageIcon("images/profile/" + (player.getRandomProfileImage()) + ".png");
+                            JLabel playerProfile = new JLabel(profileImageIcon);
 
-                            imageIcon = new ImageIcon("images/profile/" + (player.getRandomProfileImage()) + ".png");
-
-                            JLabel playerProfile = new JLabel(imageIcon);
-
-                            panel.add(playerProfile, BorderLayout.CENTER);
-
-                            JPanel panel1 = new JPanel();
-                            panel1.setLayout(new BorderLayout(0, 0));
-
-                            panel.add(panel1, BorderLayout.SOUTH);
-
-
-                            JLabel label = new JLabel();
-                            label.setHorizontalAlignment(0);
-                            label.setText(player.getName());
-
-                            Font font = new Font(label.getFont().getName(), Font.BOLD, 20);
-                            label.setFont(font);
-
-                            panel1.add(label, BorderLayout.NORTH);
-
-
+                            // 레디 아이콘 추가
+                            ImageIcon readyImageIcon = null;
                             if(player.isReady()) {
-                                imageIcon = new ImageIcon("images/ready-italic-icon-fill.png");
+                                readyImageIcon = new ImageIcon("images/ready-italic-icon-fill.png");
                             }else {
-                                imageIcon = new ImageIcon("images/ready-italic-icon-outline.png");
+                                readyImageIcon = new ImageIcon("images/ready-italic-icon-outline.png");
                             }
+                            JLabel readyLabel = new JLabel(readyImageIcon);
 
-                            JLabel label2 = new JLabel(imageIcon);
+                            // 패널에 붙이기
+                            mainPanel.add(playerProfile, BorderLayout.CENTER);
+                            mainPanel.add(crownImg, BorderLayout.NORTH);
+                            mainPanel.add(southPanel, BorderLayout.SOUTH);
 
-                            panel1.add(label2, BorderLayout.CENTER);
+                            JLabel playerNameLabel = new JLabel();
+                            playerNameLabel.setHorizontalAlignment(0);
+                            playerNameLabel.setText(player.getName());
 
-                            RoomPlayerListPanel.this.add(panel);
+                            Font font = new Font(playerNameLabel.getFont().getName(), Font.BOLD, 20);
+                            playerNameLabel.setFont(font);
+
+                            southPanel.add(playerNameLabel, BorderLayout.NORTH);
+                            southPanel.add(readyLabel, BorderLayout.CENTER);
+
+                            RoomPlayerListPanel.this.add(mainPanel);
                             RoomPlayerListPanel.this.revalidate();
                             RoomPlayerListPanel.this.repaint();
                         }
