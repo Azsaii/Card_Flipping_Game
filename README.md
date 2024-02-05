@@ -9,8 +9,8 @@ java로 구현된 3학년 2학기 네트워크 프로그래밍 과목 기말 프
 
 [실행 방법]
 
-1. 서버 실행: GameServer.java를 실행 시킨다.
-2. 클라이언트 실행: 플레이어 수 만큼 MainFrame.java를 실행 시킨다.
+1. 서버 실행: GameServer.java를 실행시킨다.
+2. 클라이언트 실행: 플레이어 수 만큼 MainFrame.java를 실행시킨다.
 
 
 
