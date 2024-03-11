@@ -46,4 +46,19 @@ java로 구현된 3학년 2학기 네트워크 프로그래밍 과목 기말 프
 - 얼음
   - 모든 카드와 아이템 상호작용 불가. 
   - 지속시간: 7초, 쿨 타임: 10초
+ 
 
+[스크린샷]
+
+시작 화면
+![n1](https://github.com/Azsaii/Card_Flipping_Game/assets/120641012/c9b13535-ecf3-4641-bccd-93ab1d193bf8)
+
+준비 화면
+![n2](https://github.com/Azsaii/Card_Flipping_Game/assets/120641012/496f655c-7225-4876-b93e-1c3c0d90fb90)
+
+게임 화면
+![n3](https://github.com/Azsaii/Card_Flipping_Game/assets/120641012/f2a863dc-01bb-477b-b387-f5f673bce207)
+![n4](https://github.com/Azsaii/Card_Flipping_Game/assets/120641012/689b9f2e-afd7-4d78-920a-c3455f32fbb3)
+
+채팅 및 게임 종료 화면
+![n5](https://github.com/Azsaii/Card_Flipping_Game/assets/120641012/a297c35f-4e8f-42cc-87d2-6661c4fb98ee)
